@@ -179,6 +179,9 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 .viewer canvas{width:100%;height:100%;display:block}
 .viewer .v-hint{position:absolute;bottom:12px;left:12px;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;background:var(--paper);border:1.5px solid var(--ink);padding:5px 10px;pointer-events:none}
 .viewer .v-tag{position:absolute;top:-2px;right:14px;background:var(--rouge);color:var(--paper);border:2px solid var(--ink);font-size:.56rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:5px 10px}
+.viewer.no3d{display:flex;align-items:center;justify-content:center}
+.viewer.no3d canvas,.viewer.no3d .v-hint{display:none}
+.viewer.no3d::before{content:'Maquette 3D indisponible — activez WebGL dans votre navigateur';max-width:62%;text-align:center;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#777}
 .v-controls{display:flex;gap:10px;margin-top:14px}
 .v-controls button{font-family:var(--body);font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;border:1.5px solid var(--ink);background:var(--paper);padding:8px 14px;cursor:pointer;transition:background .25s,color .25s}
 .v-controls button:hover,.v-controls button.on{background:var(--rouge);color:var(--paper)}
@@ -302,20 +305,17 @@ footer .jp{color:var(--rouge)}
   <div>
     <div class="eyebrow reveal"><span class="jp">建築事務所</span> Architecture · Urbanisme · Bruxelles</div>
     <h1 class="reveal d1">Dessiner la ville<br>comme on trace<br><span class="accent">un plan d'avenir</span>.</h1>
-    <p class="reveal d2">Atelier Yohaku — « l'espace vide » en japonais — conçoit des bâtiments et des quartiers où le plein et le vide dialoguent. Faites défiler : la ville se construit sous vos yeux.</p>
+    <p class="reveal d2">L'atelier du « vide », où le plein et le vide dialoguent. Faites défiler : la ville se construit sous vos yeux.</p>
     <div class="hero-actions reveal d3">
       <a class="btn" href="#projets">Voir les projets <span class="arrow">→</span></a>
       <a class="btn ghost" href="#volume">Explorer en 3D</a>
     </div>
   </div>
   <aside class="hero-card reveal d2">
-    <span class="tag">Futur Développement 1</span>
-    <h3>Pôle gare &amp; logements</h3>
-    <div class="meta">Masterplan · 12 ha · En cours</div>
-    <div class="photo" style="height:170px">
-      <img src="https://picsum.photos/seed/yohaku-hero/640/420?grayscale" alt="Photographie architecturale en noir et blanc" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
-      <span class="ph-label">Site · Gare Nord</span>
-    </div>
+    <span class="tag">余白</span>
+    <h3>Yohaku</h3>
+    <div class="meta">L'espace vide</div>
+    <p style="font-size:.86rem;color:#444;margin-top:12px">Ce qui n'est pas bâti compte autant que ce qui l'est.</p>
   </aside>
   <div class="scroll-hint"><span class="line"></span> Défiler <span style="color:var(--rouge)">下</span></div>
 </header>
@@ -457,7 +457,9 @@ footer .jp{color:var(--rouge)}
   <span>Bruxelles, Belgique</span>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>window.THREE||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');</script>
+<script>window.THREE||document.write('<script src="https://unpkg.com/three@0.128.0/build/three.min.js"><\/script>');</script>
 <script>
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const INK=0x0E0E0E, ROUGE=0x7A0E14, ROUGE_VIF=0x9E1620;
@@ -527,7 +529,8 @@ const viewer=(function(){
   const canvas=document.getElementById('pmCanvas');
   const box=document.getElementById('pmViewer');
   if(!window.THREE) return null;
-  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  let renderer;
+  try{renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});}catch(e){return null;}
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(38,1,.1,300);
@@ -712,7 +715,9 @@ function openProject(id){
   document.getElementById('pmScroll').scrollTop=0;
   requestAnimationFrame(()=>{
     pmodal.classList.add('visible');
-    viewer&&viewer.show(p.model);
+    const box=document.getElementById('pmViewer');
+    if(viewer){box.classList.remove('no3d');viewer.show(p.model);}
+    else{box.classList.add('no3d');}
   });
 }
 function closeProject(){
@@ -737,7 +742,8 @@ document.addEventListener('keydown',e=>{
 (function(){
   const canvas=document.getElementById('cityCanvas');
   if(!canvas||!window.THREE)return;
-  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  let renderer;
+  try{renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});}catch(e){return;}
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(40,1,.1,200);
@@ -797,7 +803,8 @@ document.addEventListener('keydown',e=>{
   const canvas=document.getElementById('towerCanvas');
   const wrap=document.getElementById('tourWrap');
   if(!canvas||!wrap||!window.THREE)return;
-  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  let renderer;
+  try{renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});}catch(e){return;}
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   const scene=new THREE.Scene();
   scene.fog=new THREE.Fog(0x0E0E0E,28,72); // brume de profondeur
