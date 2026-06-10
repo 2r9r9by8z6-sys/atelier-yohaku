@@ -56,9 +56,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:
 #cityCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 /* voile dégradé : éclaircit le haut (sous la nav) et le centre derrière le texte, laisse la skyline émerger en bas */
 .hero-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:
-  radial-gradient(120% 75% at 50% 42%, rgba(255,255,255,.92) 0%, rgba(255,255,255,.72) 34%, rgba(255,255,255,0) 66%),
-  linear-gradient(to bottom, rgba(255,255,255,.96) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0) 78%, rgba(255,255,255,.55) 100%)}
+  radial-gradient(95% 60% at 50% 40%, rgba(255,255,255,.62) 0%, rgba(255,255,255,.28) 38%, rgba(255,255,255,0) 64%),
+  linear-gradient(to bottom, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 22%, rgba(255,255,255,0) 80%, rgba(255,255,255,.35) 100%)}
 .hero-center{position:relative;z-index:2;max-width:880px;display:flex;flex-direction:column;align-items:center}
+.hero-center h1,.hero-center .eyebrow,.hero-center p{text-shadow:0 1px 18px rgba(255,255,255,.9),0 1px 3px rgba(255,255,255,.9)}
 .eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;display:flex;align-items:center;gap:14px;margin-bottom:26px}
 .eyebrow::before{content:'';width:48px;height:2px;background:var(--rouge)}
 .eyebrow .jp{color:var(--rouge);letter-spacing:.1em}
@@ -194,7 +195,7 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 
 /* ====== SECTION TOUR ====== */
 .tour3d{padding:0;background:var(--ink);color:var(--paper)}
-.tour-wrap{height:320vh;position:relative}
+.tour-wrap{height:480vh;position:relative}
 .tour-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center}
 #towerCanvas{position:absolute;inset:0;width:100%;height:100%}
 .tour-copy{position:relative;z-index:2;padding:0 110px 0 48px;max-width:560px;pointer-events:none}
@@ -202,7 +203,12 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 .tour-copy h2{margin:16px 0 14px}
 .tour-copy h2 .jp{color:var(--rouge-vif)}
 .tour-copy p{color:#c9c9c9;max-width:42ch}
-.tour-phase{margin-top:30px;font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;font-weight:700;border:1.5px solid var(--paper);display:inline-flex;align-items:center;gap:12px;padding:9px 16px}
+.tour-steps{list-style:none;margin:26px 0 0;padding:0;display:flex;flex-direction:column;gap:2px;max-width:300px}
+.tour-steps li{font-size:.74rem;letter-spacing:.04em;font-weight:500;color:#7c7c7c;padding:7px 12px;border-left:2px solid #3a3a3a;display:flex;gap:12px;align-items:baseline;transition:color .3s,border-color .3s,background .3s}
+.tour-steps li b{color:#5a5a5a;font-family:var(--display);font-weight:700;transition:color .3s}
+.tour-steps li.active{color:var(--paper);border-left-color:var(--rouge-vif);background:rgba(158,22,32,.14)}
+.tour-steps li.active b{color:var(--rouge-vif)}
+.tour-phase{margin-top:26px;font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;font-weight:700;border:1.5px solid var(--paper);display:inline-flex;align-items:center;gap:12px;padding:9px 16px}
 .tour-phase .dot{width:10px;height:10px;border-radius:50%;background:var(--rouge-vif);animation:blink 1.6s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 .tour-progress{position:absolute;bottom:30px;left:48px;right:110px;z-index:2;height:3px;background:rgba(255,255,255,.18)}
@@ -310,12 +316,12 @@ footer .jp{color:var(--rouge)}
   <canvas id="cityCanvas"></canvas>
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="hero-center">
-    <div class="eyebrow reveal"><span class="jp">建築事務所</span> Architecture · Urbanisme · Bruxelles</div>
-    <h1 class="reveal d1">Dessiner la ville<br>comme on trace <span class="accent">un plan d'avenir</span>.</h1>
-    <p class="reveal d2">L'atelier du vide <span class="jp">余白</span> — le plein et le vide en dialogue.</p>
+    <div class="eyebrow reveal"><span class="jp">建築事務所</span> Architecture · Gratte-ciels · New York</div>
+    <h1 class="reveal d1">Bâtir New York<br>comme on empile <span class="accent">un rêve vertical</span>.</h1>
+    <p class="reveal d2">L'atelier des hauteurs <span class="jp">余白</span> — chaque tour naît d'un vide à conquérir.</p>
     <div class="hero-actions reveal d3">
       <a class="btn" href="#projets">Voir les projets <span class="arrow">→</span></a>
-      <a class="btn ghost" href="#volume">Explorer en 3D</a>
+      <a class="btn ghost" href="#volume">Voir une tour se construire</a>
     </div>
   </div>
   <div class="scroll-hint"><span class="line"></span> Défiler <span style="color:var(--rouge)">下</span></div>
@@ -394,9 +400,17 @@ footer .jp{color:var(--rouge)}
       <canvas id="towerCanvas"></canvas>
       <div class="tour-copy">
         <span class="sec-num">N°02</span>
-        <h2>Tours Komorebi<span class="jp">塔</span></h2>
-        <p>Continuez à défiler : noyau, plateaux, torsion, résille. La tour se construit en fonction de votre descente.</p>
-        <div class="tour-phase"><span class="dot"></span><span id="phaseLabel">Phase 01 — Noyau</span></div>
+        <h2>One Yohaku Tower<span class="jp">塔</span></h2>
+        <p>Défilez pour bâtir le gratte-ciel, étape par étape : on voit chaque système se mettre en place, des fondations au couronnement.</p>
+        <ol class="tour-steps">
+          <li><b>01</b> Fondations &amp; radier</li>
+          <li><b>02</b> Noyau central</li>
+          <li><b>03</b> Planchers</li>
+          <li><b>04</b> Structure (poteaux)</li>
+          <li><b>05</b> Façade vitrée</li>
+          <li><b>06</b> Couronnement</li>
+        </ol>
+        <div class="tour-phase"><span class="dot"></span><span id="phaseLabel">Étape 01 — Fondations</span></div>
       </div>
       <div class="tour-progress"><div class="bar" id="tourBar"></div></div>
     </div>
@@ -406,7 +420,7 @@ footer .jp{color:var(--rouge)}
 <!-- ====== ATELIER ====== -->
 <section class="atelier" id="atelier">
   <div class="sec-head reveal"><span class="sec-num">N°03</span><h2>L'Atelier<span class="jp">事務所</span></h2></div>
-  <p class="sec-sub reveal d1">Fondé à Bruxelles, l'atelier réunit architectes et urbanistes autour d'une conviction : le vide structure autant que le bâti.</p>
+  <p class="sec-sub reveal d1">Installé à New York, l'atelier réunit architectes et ingénieurs autour d'une conviction : un gratte-ciel se pense d'abord par le vide qu'il libère au sol.</p>
   <div class="atelier-grid reveal d2">
     <div class="stat"><div class="num" data-count="48">0</div><div class="lab">Projets livrés</div></div>
     <div class="stat"><div class="num" data-count="12">0</div><div class="lab">Masterplans</div></div>
@@ -434,19 +448,19 @@ footer .jp{color:var(--rouge)}
   <div class="contact-wrap">
     <div class="contact-card reveal d1">
       <div class="field" id="fNom"><label for="nom">Nom</label><input id="nom" type="text" placeholder="Votre nom"><span class="err">Indiquez votre nom</span></div>
-      <div class="field" id="fEmail"><label for="email">E-mail</label><input id="email" type="email" placeholder="vous@exemple.be"><span class="err">E-mail invalide</span></div>
+      <div class="field" id="fEmail"><label for="email">E-mail</label><input id="email" type="email" placeholder="you@example.com"><span class="err">E-mail invalide</span></div>
       <div class="field" id="fMsg"><label for="msg">Votre projet</label><textarea id="msg" rows="4" placeholder="Décrivez le site, le programme, vos envies…"></textarea><span class="err">Dites-nous en un peu plus</span></div>
       <button class="btn" id="sendBtn" type="button">Envoyer le message →</button>
       <div class="toast" id="toast">+ Message envoyé. Nous revenons vers vous sous 48 h.</div>
     </div>
     <div class="contact-info reveal d2">
-      <p>L'atelier reçoit sur rendez-vous, dans un ancien entrepôt face au canal. Les maquettes sont sur la table, le café est chaud.</p>
-      <div class="coord"><span class="plus">+</span>Quai des Charbonnages 12, 1080 Bruxelles</div>
-      <div class="coord"><span class="plus">+</span>bonjour@atelier-yohaku.be</div>
-      <div class="coord"><span class="plus">+</span>+32 2 000 00 00</div>
+      <p>L'atelier reçoit sur rendez-vous, au dernier étage d'un loft de Tribeca. Les maquettes sont sur la table, le café est chaud, la skyline est à la fenêtre.</p>
+      <div class="coord"><span class="plus">+</span>120 Hudson Street, New York, NY 10013</div>
+      <div class="coord"><span class="plus">+</span>hello@atelier-yohaku.nyc</div>
+      <div class="coord"><span class="plus">+</span>+1 (212) 000-0000</div>
       <div class="photo" style="height:200px;margin-top:26px">
-        <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=720&h=420&fit=crop&q=72&auto=format" alt="L'atelier face au canal" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
-        <span class="ph-label">L'atelier · Molenbeek</span>
+        <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=720&h=420&fit=crop&q=72&auto=format" alt="L'atelier à Tribeca" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
+        <span class="ph-label">L'atelier · Tribeca</span>
       </div>
     </div>
   </div>
@@ -454,8 +468,8 @@ footer .jp{color:var(--rouge)}
 
 <footer>
   <span>© 2026 Atelier Yohaku <span class="jp">余白</span></span>
-  <span>Architecture · Urbanisme · <span class="jp">建築</span></span>
-  <span>Bruxelles, Belgique</span>
+  <span>Architecture · Gratte-ciels · <span class="jp">建築</span></span>
+  <span>New York, USA</span>
 </footer>
 
 <script>/* Three.js r128 — intégré pour fonctionner hors-ligne */
@@ -1963,30 +1977,30 @@ function createRenderer(canvas){
    DONNÉES PROJETS
    ============================================================ */
 const PROJECTS = [
- {id:'gare-nord', cat:'urbain', catLabel:'Masterplan', title:'Quartier de la Gare Nord', lieu:'Bruxelles, Belgique', annee:'2025', seed:'yohaku-urb1', photo:'1477959858617-67f85cf4f1df', model:'masterplan',
-  specs:{'Surface':'12 ha','Programme':'Mixte gare + logements','Maîtrise d\u2019ouvrage':'Région BXL','Statut':'En cours','Budget':'84 M€','Livraison':'2029'},
-  timeline:[{d:'2023 T2',l:'Concours remporté',s:'done'},{d:'2024 T1',l:'Masterplan approuvé',s:'done'},{d:'2025 T3',l:'Permis — phase 1',s:'now'},{d:'2027',l:'Chantier infrastructures',s:''},{d:'2029',l:'Livraison phase 1',s:''}],
-  desc:['Reconnexion d\u2019un pôle ferroviaire au centre-ville : la voie, longtemps coupure, devient colonne vertébrale. Logements, programmes universitaires et musée s\u2019accrochent à une promenade plantée continue.','Le plan laisse un tiers du site non bâti — places, vergers, zones humides — selon le principe du yohaku : c\u2019est le vide qui donne sa valeur au plein.']},
- {id:'verger', cat:'logement', catLabel:'Logement', title:'Maisons du Verger', lieu:'Namur, Belgique', annee:'2024', seed:'yohaku-log1', photo:'1480074568708-e7b720bb3f09', model:'houses',
-  specs:{'Surface':'4 800 m²','Programme':'32 logements','Maîtrise d\u2019ouvrage':'Coopérative','Statut':'Livré','Budget':'9,6 M€','Certification':'Passif'},
-  timeline:[{d:'2021',l:'Esquisse & ateliers habitants',s:'done'},{d:'2022 T2',l:'Permis obtenu',s:'done'},{d:'2023',l:'Chantier bois',s:'done'},{d:'2024 T3',l:'Livraison & plantation du verger',s:'done'}],
-  desc:['Trente-deux logements en bande autour d\u2019un verger partagé. Structure bois locale, toitures à pente japonaise, seuils généreux : l\u2019engawa belge.','Chaque maison possède deux façades de vie — côté rue, côté verger — et aucune clôture : les limites sont dessinées par les arbres.']},
- {id:'engawa', cat:'public', catLabel:'Équipement', title:'Médiathèque Engawa', lieu:'Gand, Belgique', annee:'2024', seed:'yohaku-pub1', photo:'1521587760476-6c12a4b040da', model:'pavilion',
-  specs:{'Surface':'3 200 m²','Programme':'Médiathèque + café','Maîtrise d\u2019ouvrage':'Ville de Gand','Statut':'Livré','Budget':'11,2 M€','Prix':'Prix Belge d\u2019Arch. 2025'},
-  timeline:[{d:'2020',l:'Concours remporté',s:'done'},{d:'2021',l:'Études & permis',s:'done'},{d:'2022-23',l:'Chantier',s:'done'},{d:'2024 T1',l:'Ouverture au public',s:'done'}],
-  desc:['Une véranda habitée entre le parc et la rue : la limite devient un lieu, comme l\u2019engawa des maisons japonaises.','Un grand toit plat porté par une forêt de colonnes fines abrite des salles de lecture qui s\u2019ouvrent entièrement sur le parc en été.']},
- {id:'croisement', cat:'urbain', catLabel:'Masterplan', title:'Croisement à niveau — Révision', lieu:'Louvain, Belgique', annee:'2023', seed:'yohaku-urb2', photo:'1519501025264-65ba15a82390', model:'intersection',
-  specs:{'Surface':'2,1 ha','Programme':'Espace public','Maîtrise d\u2019ouvrage':'Ville de Louvain','Statut':'Livré','Budget':'4,3 M€','Trafic apaisé':'-46 %'},
-  timeline:[{d:'2021',l:'Étude de mobilité',s:'done'},{d:'2022 T1',l:'Concertation citoyenne',s:'done'},{d:'2022 T4',l:'Chantier en site occupé',s:'done'},{d:'2023 T2',l:'Inauguration de la place',s:'done'}],
-  desc:['Pacification d\u2019une intersection routière : la voiture cède la priorité, le piéton retrouve la diagonale.','Le carrefour devient une place traversante : un sol unique, des croix peintes au sol comme sur nos plans, et quatre bâtiments d\u2019angle qui tiennent l\u2019espace.']},
- {id:'komorebi', cat:'logement', catLabel:'Logement', title:'Tours Komorebi', lieu:'Anvers, Belgique', annee:'2023', seed:'yohaku-log2', photo:'1460317442991-0ec209397118', model:'tower',
-  specs:{'Hauteur':'72 m · 22 étages','Programme':'140 logements','Maîtrise d\u2019ouvrage':'Privé + AIS','Statut':'Livré','Budget':'38 M€','Structure':'Noyau béton + bois'},
-  timeline:[{d:'2019',l:'Concours remporté',s:'done'},{d:'2020',l:'Permis & études',s:'done'},{d:'2021-22',l:'Chantier',s:'done'},{d:'2023 T4',l:'Livraison',s:'done'}],
-  desc:['Deux tours décalées qui filtrent la lumière comme les feuillages — komorebi, la lumière qui passe entre les arbres.','Les plateaux pivotent légèrement à chaque niveau : chaque logement gagne une orientation propre, et la façade devient une résille vivante. La grande maquette de la section « Volume » montre ce principe en mouvement.']},
- {id:'tarn', cat:'public', catLabel:'Équipement', title:'Pavillon du Musée Tarn', lieu:'Bruxelles, Belgique', annee:'2022', seed:'yohaku-pub2', photo:'1518998053901-5348d3961a04', model:'origami',
-  specs:{'Surface':'860 m²','Programme':'Extension muséale','Maîtrise d\u2019ouvrage':'Fondation Tarn','Statut':'Livré','Budget':'3,1 M€','Structure':'Charpente CLT'},
-  timeline:[{d:'2020',l:'Commande directe',s:'done'},{d:'2021 T1',l:'Permis patrimoine',s:'done'},{d:'2021-22',l:'Préfabrication & montage',s:'done'},{d:'2022 T3',l:'Ouverture',s:'done'}],
-  desc:['Extension muséale en charpente apparente : un origami de bois posé dans la cour historique.','Le volume plié ne touche les façades classées en aucun point ; il repose sur un socle de pierre bleue et se lit comme une maquette à l\u2019échelle 1.']}
+ {id:'one-yohaku', cat:'logement', catLabel:'Tour r\u00e9sidentielle', title:'One Yohaku Tower', lieu:'Midtown Manhattan, New York', annee:'2025', seed:'ny-tower', photo:'1543716091-a840c05249ec', model:'tower',
+  specs:{'Hauteur':'412 m \u00b7 88 \u00e9tages','Programme':'Logements de luxe + bureaux','Ma\u00eetrise d\u2019ouvrage':'Yohaku Development','Statut':'En cours','Budget':'1,9 Md $','Structure':'Noyau b\u00e9ton + m\u00e9ga-colonnes'},
+  timeline:[{d:'2021',l:'Concours international remport\u00e9',s:'done'},{d:'2022',l:'Fondations & radier',s:'done'},{d:'2023-24',l:'\u00c9l\u00e9vation du noyau & planchers',s:'done'},{d:'2025 T2',l:'Pose de la fa\u00e7ade',s:'now'},{d:'2026',l:'Livraison & couronnement',s:''}],
+  desc:['Une supertall plant\u00e9e au c\u0153ur de Midtown, cern\u00e9e par les gratte-ciels : la tour gagne le ciel par retraits successifs, \u00e0 la mani\u00e8re des ziggourats new-yorkaises.','Quatre-vingt-huit niveaux de logements d\u2019exception au-dessus d\u2019un socle public. La grande maquette de la section \u00ab Volume \u00bb montre, \u00e9tape par \u00e9tape, comment ce b\u00e2timent se construit.']},
+ {id:'hudson', cat:'logement', catLabel:'Condos de luxe', title:'Hudson Yards Residences', lieu:'Hudson Yards, New York', annee:'2024', seed:'ny-hudson', photo:'1485871981521-5b1fd3805eee', model:'cluster',
+  specs:{'Hauteur':'5 tours \u00b7 60-75 \u00e9t.','Programme':'820 condominiums','Ma\u00eetrise d\u2019ouvrage':'Related-Yohaku','Statut':'Livr\u00e9','Budget':'3,4 Md $','Certification':'LEED Platinum'},
+  timeline:[{d:'2019',l:'Plan-masse approuv\u00e9',s:'done'},{d:'2020-21',l:'Dalle sur les voies',s:'done'},{d:'2022-23',l:'Chantier des cinq tours',s:'done'},{d:'2024',l:'Livraison',s:'done'}],
+  desc:['Cinq tours de verre dress\u00e9es sur une dalle au-dessus des voies ferr\u00e9es : un quartier vertical pos\u00e9 l\u00e0 o\u00f9 il n\u2019y avait que des rails.','Les volumes se d\u00e9calent pour pr\u00e9server les vues sur l\u2019Hudson \u2014 chaque appartement regarde le fleuve.']},
+ {id:'park-ave', cat:'logement', catLabel:'Appartements', title:'Park Avenue Penthouses', lieu:'Upper East Side, New York', annee:'2024', seed:'ny-park', photo:'1560448204-e02f11c3d0e2', model:'highrise',
+  specs:{'Hauteur':'210 m \u00b7 52 \u00e9tages','Programme':'96 appartements','Ma\u00eetrise d\u2019ouvrage':'Priv\u00e9','Statut':'Livr\u00e9','Budget':'780 M $','Atouts':'Vue Central Park'},
+  timeline:[{d:'2020',l:'Acquisition du terrain',s:'done'},{d:'2021',l:'Permis & fondations',s:'done'},{d:'2022-23',l:'Chantier',s:'done'},{d:'2024 T1',l:'Emm\u00e9nagements',s:'done'}],
+  desc:['Une tour r\u00e9sidentielle \u00e9lanc\u00e9e sur socle de pierre, gliss\u00e9e entre les immeubles class\u00e9s de Park Avenue.','Un appartement par \u00e9tage dans les niveaux hauts : des penthouses traversants qui dominent Central Park.']},
+ {id:'brooklyn', cat:'logement', catLabel:'Logement', title:'Brooklyn Waterfront', lieu:'Williamsburg, Brooklyn', annee:'2023', seed:'ny-brooklyn', photo:'1522083165195-3424ed129620', model:'block',
+  specs:{'Surface':'6,5 ha','Programme':'1 200 logements','Ma\u00eetrise d\u2019ouvrage':'NYC HDC','Statut':'Livr\u00e9','Budget':'1,1 Md $','Mixit\u00e9':'30 % abordable'},
+  timeline:[{d:'2018',l:'Concours remport\u00e9',s:'done'},{d:'2019-20',l:'\u00celots bas',s:'done'},{d:'2021-22',l:'Tours sur le front d\u2019eau',s:'done'},{d:'2023',l:'Esplanade & livraison',s:'done'}],
+  desc:['Des \u00eelots-p\u00e9rim\u00e8tres en briques c\u00f4t\u00e9 quartier, des tours c\u00f4t\u00e9 fleuve : la silhouette monte vers l\u2019East River et la skyline de Manhattan.','Le c\u0153ur des \u00eelots est rendu aux habitants \u2014 cours plant\u00e9es, toits partag\u00e9s, rez-de-chauss\u00e9e actifs.']},
+ {id:'hudson-museum', cat:'public', catLabel:'\u00c9quipement', title:'The Hudson Museum', lieu:'Chelsea, New York', annee:'2022', seed:'ny-museum', photo:'1518998053901-5348d3961a04', model:'pavilion',
+  specs:{'Surface':'14 000 m\u00b2','Programme':'Mus\u00e9e d\u2019art contemporain','Ma\u00eetrise d\u2019ouvrage':'Fondation Hudson','Statut':'Livr\u00e9','Budget':'420 M $','Prix':'AIA Honor Award'},
+  timeline:[{d:'2017',l:'Concours remport\u00e9',s:'done'},{d:'2018-19',l:'\u00c9tudes & permis',s:'done'},{d:'2020-21',l:'Chantier',s:'done'},{d:'2022',l:'Ouverture au public',s:'done'}],
+  desc:['Un grand toit suspendu sur une for\u00eat de colonnes, au pied de la High Line : la rue entre dans le mus\u00e9e et le mus\u00e9e d\u00e9borde sur la ville.','Des plateaux libres et lumineux que les commissaires r\u00e9inventent \u00e0 chaque exposition.']},
+ {id:'downtown', cat:'urbain', catLabel:'Masterplan', title:'Lower Manhattan 2040', lieu:'Financial District, New York', annee:'2025', seed:'ny-downtown', photo:'1496588152823-86ff7695e68f', model:'masterplan',
+  specs:{'Surface':'42 ha','Programme':'Quartier mixte','Ma\u00eetrise d\u2019ouvrage':'NYC EDC','Statut':'En cours','Budget':'7,2 Md $','Livraison':'2040'},
+  timeline:[{d:'2022',l:'Vision approuv\u00e9e',s:'done'},{d:'2024',l:'Plan-masse d\u00e9taill\u00e9',s:'done'},{d:'2025',l:'Premi\u00e8res tours',s:'now'},{d:'2030',l:'Parc & berges',s:''},{d:'2040',l:'Ach\u00e8vement',s:''}],
+  desc:['Densifier la pointe de Manhattan tout en lui rendant son ciel : une trame de gratte-ciels resserr\u00e9s autour d\u2019un grand parc central \u2014 le vide qui donne de la valeur au plein.','Les berges deviennent une digue habit\u00e9e qui prot\u00e8ge le quartier de la mont\u00e9e des eaux.']}
 ];
 
 /* ============================================================
@@ -2039,11 +2053,14 @@ const viewer=(function(){
   const inkLine=()=>new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.9});
   const redLine=()=>new THREE.LineBasicMaterial({color:ROUGE_VIF});
   const inkFill=()=>new THREE.MeshBasicMaterial({color:INK});
+  const steelFill=()=>new THREE.MeshBasicMaterial({color:0x2A2A2C});
   const softFill=()=>new THREE.MeshBasicMaterial({color:0xF4F4F2});
+  const whiteFill=()=>new THREE.MeshBasicMaterial({color:0xffffff});
   const redMesh=()=>new THREE.MeshBasicMaterial({color:ROUGE});
   const glassFill=()=>new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.45});
+  const glassBlue=()=>new THREE.MeshBasicMaterial({color:0xCBDCE7,transparent:true,opacity:.6});
   function edges(geo,mat){return new THREE.LineSegments(new THREE.EdgesGeometry(geo),mat)}
-  // volume plein : face légèrement rentrée + arêtes nettes (rendu maquette solide, marche aussi en SVG)
+  // solid volume: slightly inset face + crisp edges (also works in SVG)
   function solid(geo,fill,line){
     const grp=new THREE.Group();
     const f=geo.clone(); f.scale(.992,.992,.992);
@@ -2051,13 +2068,43 @@ const viewer=(function(){
     grp.add(edges(geo,line||inkLine()));
     return grp;
   }
-  // bâtiment posé au sol en (x,z)
+  // building on ground at (x,z)
   function block(w,h,d,x,z,red){
     const geo=new THREE.BoxGeometry(w,h,d); geo.translate(0,h/2,0);
     const g=solid(geo, red?redMesh():softFill(), red?redLine():inkLine());
     g.position.set(x,0,z); return g;
   }
-  // arbre stylisé (tronc + houppier conique)
+  // NY-style setback tower (stacked boxes shrinking upward), optional spire
+  function setbackTower(x,z,h,w,red){
+    const g=new THREE.Group(); g.position.set(x,0,z);
+    const seg=h>10?3:(h>5?2:1); let y=0;
+    for(let i=0;i<seg;i++){
+      const sh=h/seg, cw=w*(1-i*0.17);
+      const geo=new THREE.BoxGeometry(cw,sh,cw); geo.translate(0,sh/2,0);
+      const top=(i===seg-1);
+      const g2=solid(geo,(red&&top)?redMesh():softFill(),(red&&top)?redLine():inkLine());
+      g2.position.y=y; g.add(g2); y+=sh;
+    }
+    if(h>12){const sp=new THREE.CylinderGeometry(.02,.12,h*.18,5); sp.translate(0,y+h*.09,0); g.add(new THREE.Mesh(sp,red?redMesh():inkFill()));}
+    return g;
+  }
+  // ring/field of surrounding skyscrapers (the "buildings around buildings")
+  function skyline(g,opts){
+    opts=opts||{}; const inner=opts.inner||8, outer=opts.outer||17, count=opts.count||70, max=opts.max||12;
+    for(let i=0;i<count;i++){
+      const a=Math.random()*Math.PI*2, r=inner+Math.random()*(outer-inner);
+      const x=Math.cos(a)*r, z=Math.sin(a)*r, fall=(r-inner)/(outer-inner);
+      const h=2+Math.pow(Math.random(),1.4)*max*(1-fall*.45), w=1+Math.random()*.7;
+      g.add(setbackTower(x,z,h,w,Math.random()<.04));
+    }
+  }
+  // perimeter (courtyard) block: four bars around a court
+  function perimeterBlock(g,cx,cz,size,h){
+    const t=size/2-.5;
+    const mk=(w,d,x,z)=>{const geo=new THREE.BoxGeometry(w,h,d);geo.translate(0,h/2,0);const b=solid(geo,softFill(),inkLine());b.position.set(cx+x,0,cz+z);g.add(b);};
+    mk(size,1,0,t); mk(size,1,0,-t); mk(1,size-2,t,0); mk(1,size-2,-t,0);
+  }
+  // stylized tree
   function tree(x,z,s){
     s=s||1; const g=new THREE.Group();
     const tr=new THREE.CylinderGeometry(.06,.09,.9*s,5); tr.translate(0,.45*s,0);
@@ -2066,149 +2113,104 @@ const viewer=(function(){
     g.add(new THREE.Mesh(cr,softFill())); g.add(edges(cr,inkLine()));
     g.position.set(x,0,z); return g;
   }
-  function ground(g){
-    const pts=[]; const n=14;
+  function ground(g,n){
+    n=n||14; const pts=[];
     for(let x=-n;x<=n;x+=2){for(let z=-n;z<=n;z+=2){const s=.16;pts.push(x-s,0,z,x+s,0,z,x,0,z-s,x,0,z+s);}}
     const geo=new THREE.BufferGeometry();
     geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
-    g.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.22})));
+    g.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.2})));
   }
 
   const builders={
-    // QUARTIER GARE NORD — voie ferrée, gare, îlots de logements, grand parc (le vide)
-    masterplan(g){
-      ground(g);
-      // voie ferrée rouge en diagonale (2 rails + traverses) + parvis
-      const rail=new THREE.Group(); rail.rotation.y=.42;
-      [-.5,.5].forEach(o=>{const r=new THREE.BoxGeometry(.16,.16,28);r.translate(o,.08,0);rail.add(new THREE.Mesh(r,redMesh()));rail.add(edges(r,redLine()));});
-      const tieMat=new THREE.MeshBasicMaterial({color:0x5A0A0E});
-      for(let z=-13;z<=13;z+=1.4){const t=new THREE.BoxGeometry(1.4,.1,.3);t.translate(0,.05,z);rail.add(new THREE.Mesh(t,tieMat));}
-      g.add(rail);
-      // gare : grand volume vitré au-dessus de la voie
-      const stationGeo=new THREE.BoxGeometry(4.2,2.6,4.2); stationGeo.translate(0,1.3,0);
-      const station=solid(stationGeo,glassFill(),redLine()); station.rotation.y=.42; g.add(station);
-      // îlots de logements (grille régulière) côté "ville"
-      for(let i=0;i<3;i++)for(let j=0;j<4;j++){
-        const x=4.5+i*2.7, z=-7+j*3, h=2.4+((i*2+j)%4)*1.5;
-        g.add(block(2,h,2.2,x,z,(i===1&&j===1)));
-      }
-      // grands équipements (musée / université) côté opposé : volumes larges et bas
-      g.add(block(4.6,3.2,3,-7,-4,false));
-      g.add(block(3.4,2.4,4.4,-8.4,2.6,false));
-      // parc (le vide) : quadrant laissé libre, planté
-      for(let i=0;i<6;i++) tree(-4+ (i%3)*2.2, 7+ Math.floor(i/3)*2.4, .9+ (i%2)*.3);
-      // place : anneau rouge au pied de la gare
-      const plaza=new THREE.RingGeometry(3.2,3.5,40); plaza.rotateX(-Math.PI/2); plaza.translate(0,.05,0);
-      g.add(new THREE.Mesh(plaza,redMesh()));
-      dist=34;
-    },
-    // MAISONS DU VERGER — deux bandes de maisons autour d'un verger central
-    houses(g){
-      ground(g);
-      [-7,7].forEach((bz,b)=>{
-        for(let i=0;i<6;i++){
-          const x=-9+i*3.6, h=2+((i+b)%2)*.5;
-          const base=block(2.4,h,2.6,x,bz,false);
-          const roofGeo=new THREE.ConeGeometry(1.95,1.5,4); roofGeo.rotateY(Math.PI/4); roofGeo.translate(0,h+.75,0);
-          const red=(b===0&&i===2);
-          base.add(new THREE.Mesh(roofGeo,red?redMesh():softFill()));
-          base.add(edges(roofGeo,red?redLine():inkLine()));
-          g.add(base);
-        }
-      });
-      // verger central (entre les deux bandes, z autour de 0 — plus de chevauchement)
-      for(let i=0;i<7;i++){ tree(-9+i*3,-1.6,.85+(i%2)*.25); tree(-9+i*3,1.6,.85+((i+1)%2)*.25); }
-      // allée centrale en pierre
-      const path=new THREE.BoxGeometry(18,.05,1.1); path.translate(0,.03,0);
-      g.add(new THREE.Mesh(path,softFill())); g.add(edges(path,inkLine()));
-      dist=25;
-    },
-    // MÉDIATHÈQUE ENGAWA — grand toit fin sur forêt de colonnes, volume de lecture vitré
-    pavilion(g){
-      ground(g);
-      const W=16,D=11,rh=4.6;
-      // terrasse / socle (l'engawa)
-      const deck=new THREE.BoxGeometry(W+2.4,.18,D+2.4); deck.translate(0,.09,0);
-      g.add(new THREE.Mesh(deck,softFill())); g.add(edges(deck,inkLine()));
-      // forêt de colonnes fines
-      for(let ix=-3;ix<=3;ix++)for(let iz=-2;iz<=2;iz++){
-        const c=new THREE.BoxGeometry(.14,rh,.14); c.translate(ix*2.3,rh/2,iz*2.4);
-        g.add(new THREE.Mesh(c,inkFill()));
-      }
-      // volume de lecture vitré (cœur)
-      const innerGeo=new THREE.BoxGeometry(8.6,2.9,5.8); innerGeo.translate(0,1.55,0);
-      g.add(solid(innerGeo,glassFill(),redLine()));
-      // grand toit plat
-      const roofGeo=new THREE.BoxGeometry(W,.5,D); roofGeo.translate(0,rh+.25,0);
-      g.add(solid(roofGeo,softFill(),inkLine()));
-      // arbres du parc en lisière
-      tree(-W/2-1.8,4.2,1.1); tree(W/2+1.6,-3.4,1); tree(W/2+2,3.6,.8);
-      dist=23;
-    },
-    // CROISEMENT — place traversante : sol unique, passages cloutés, diagonale, 4 angles
-    intersection(g){
-      ground(g);
-      const plazaGeo=new THREE.BoxGeometry(18,.06,18); plazaGeo.translate(0,.03,0);
-      g.add(solid(plazaGeo,softFill(),inkLine()));
-      const roadMat=inkFill();
-      const rA=new THREE.BoxGeometry(18,.09,2.8); rA.translate(0,.07,0); g.add(new THREE.Mesh(rA,roadMat));
-      const rB=new THREE.BoxGeometry(2.8,.09,18); rB.translate(0,.07,0); g.add(new THREE.Mesh(rB,roadMat));
-      // passages cloutés (croix blanches)
-      const stripe=new THREE.MeshBasicMaterial({color:0xffffff});
-      for(let i=-2;i<=2;i++){
-        const a=new THREE.BoxGeometry(.3,.02,2.6); a.translate(i*.55,.13,4.6); g.add(new THREE.Mesh(a,stripe));
-        const b=new THREE.BoxGeometry(.3,.02,2.6); b.translate(i*.55,.13,-4.6); g.add(new THREE.Mesh(b,stripe));
-        const c=new THREE.BoxGeometry(2.6,.02,.3); c.translate(4.6,.13,i*.55); g.add(new THREE.Mesh(c,stripe));
-        const d=new THREE.BoxGeometry(2.6,.02,.3); d.translate(-4.6,.13,i*.55); g.add(new THREE.Mesh(d,stripe));
-      }
-      // diagonale piétonne rouge + place centrale
-      const diag=new THREE.BoxGeometry(1.3,.05,22); diag.rotateY(Math.PI/4); diag.translate(0,.12,0);
-      g.add(new THREE.Mesh(diag,redMesh()));
-      const ring=new THREE.RingGeometry(2.2,2.5,40); ring.rotateX(-Math.PI/2); ring.translate(0,.16,0);
-      g.add(new THREE.Mesh(ring,redMesh()));
-      // 4 immeubles d'angle qui tiennent l'espace
-      [[6.4,6.4],[-6.4,6.4],[6.4,-6.4],[-6.4,-6.4]].forEach(([x,z],i)=>g.add(block(3.4,3+i*1.2,3.4,x,z,i===2)));
-      tree(0,8.2,1); tree(8.2,0,1); tree(-8.2,0,1); tree(0,-8.2,1);
-      dist=27;
-    },
-    // TOURS KOMOREBI — une tour solide, plateaux pleins torsadés, noyau, couronne
+    // ONE YOHAKU TOWER -- supertall with NY setbacks, ringed by skyscrapers
     tower(g){
-      ground(g);
-      const FL=22, FH=.62, HALF=2.4;
-      const coreGeo=new THREE.CylinderGeometry(.95,.95,FL*FH,14); coreGeo.translate(0,FL*FH/2+.3,0);
-      g.add(new THREE.Mesh(coreGeo,redMesh())); g.add(edges(coreGeo,redLine()));
-      for(let i=0;i<FL;i++){
-        const w=HALF*2*(1-(i/FL)*.18);
-        const geo=new THREE.BoxGeometry(w,FH*.6,w); geo.translate(0,0,0);
-        const red=(i%6===0);
-        const s=solid(geo,red?redMesh():softFill(),red?redLine():inkLine());
-        s.position.y=i*FH+.55; s.rotation.y=i*.1; g.add(s);
-      }
-      // couronne / belvédère
-      const crownGeo=new THREE.BoxGeometry(HALF*1.5,FH*1.4,HALF*1.5); crownGeo.translate(0,0,0);
-      const crown=solid(crownGeo,glassFill(),redLine()); crown.position.y=FL*FH+1; crown.rotation.y=FL*.1; g.add(crown);
-      const ant=new THREE.CylinderGeometry(.04,.04,2.4,6); ant.translate(0,FL*FH+2.4,0); g.add(new THREE.Mesh(ant,redMesh()));
-      dist=34; lookY=7;
+      ground(g,20);
+      skyline(g,{inner:8,outer:18,count:80,max:13});
+      const segs=[[4.4,7],[3.5,6.5],[2.7,6],[2.0,5]]; let y=0;
+      segs.forEach(s=>{
+        const w=s[0],h=s[1];
+        const geo=new THREE.BoxGeometry(w,h,w); geo.translate(0,h/2,0);
+        const b=solid(geo,softFill(),inkLine()); b.position.y=y; g.add(b);
+        const band=new THREE.BoxGeometry(w*1.03,.34,w*1.03); band.translate(0,h,0);
+        const bb=solid(band,redMesh(),redLine()); bb.position.y=y; g.add(bb);
+        y+=h;
+      });
+      const sp=new THREE.CylinderGeometry(.04,.5,5,6); sp.translate(0,y+2.5,0); g.add(new THREE.Mesh(sp,redMesh()));
+      dist=50; lookY=12;
     },
-    // PAVILLON MUSÉE TARN — origami de bois plié sur socle de pierre bleue
-    origami(g){
-      ground(g);
-      // socle de pierre bleue (sombre)
-      const plinthGeo=new THREE.BoxGeometry(8,.9,8); plinthGeo.translate(0,.45,0);
-      g.add(solid(plinthGeo,inkFill(),inkLine()));
-      // base vitrée
-      const glassGeo=new THREE.BoxGeometry(5.2,1.8,5.2); glassGeo.translate(0,1.8,0);
-      g.add(solid(glassGeo,glassFill(),inkLine()));
-      // volume plié facetté (toit origami) — pyramide à 5 pans
-      const roofGeo=new THREE.ConeGeometry(3.9,3.6,5); roofGeo.rotateY(.35); roofGeo.translate(0,4.5,0);
-      g.add(new THREE.Mesh(roofGeo,softFill())); g.add(edges(roofGeo,redLine()));
-      // entrée
-      const door=new THREE.BoxGeometry(1.3,1.6,.16); door.translate(0,1.7,2.65);
-      g.add(solid(door,glassFill(),inkLine()));
-      dist=21;
+    // HUDSON YARDS -- a cluster of glass towers on a deck, surrounded by city
+    cluster(g){
+      ground(g,20);
+      skyline(g,{inner:10,outer:18,count:55,max:9});
+      const deck=new THREE.BoxGeometry(11,.4,11); deck.translate(0,.2,0); g.add(solid(deck,softFill(),inkLine()));
+      const spots=[[-3,-2.4,15,2.4],[2.6,-3,18,2.2],[-2.2,3,12.5,2.2],[3.6,3.2,11,2],[.4,.6,21,2.6]];
+      spots.forEach(s=>{
+        const geo=new THREE.BoxGeometry(s[3],s[2],s[3]); geo.translate(0,s[2]/2+.4,0);
+        const t=solid(geo,glassBlue(),inkLine()); t.position.set(s[0],0,s[1]); g.add(t);
+        const cap=new THREE.BoxGeometry(s[3]*1.04,.3,s[3]*1.04); cap.translate(0,s[2]+.4,0);
+        const c=solid(cap,redMesh(),redLine()); c.position.set(s[0],0,s[1]); g.add(c);
+      });
+      dist=46; lookY=9;
+    },
+    // PARK AVENUE -- slim luxury highrise on a stone podium, among neighbours
+    highrise(g){
+      ground(g,18);
+      skyline(g,{inner:7,outer:16,count:55,max:10});
+      const pod=new THREE.BoxGeometry(5.2,2.4,5.2); pod.translate(0,1.2,0); g.add(solid(pod,inkFill(),inkLine()));
+      const h=18,w=3;
+      const geo=new THREE.BoxGeometry(w,h,w); geo.translate(0,h/2+2.4,0); g.add(solid(geo,softFill(),inkLine()));
+      for(let i=1;i<=10;i++){const b=new THREE.BoxGeometry(w*1.16,.16,w*1.16); b.translate(0,2.4+i*1.5,0); g.add(solid(b,redMesh(),redLine()));}
+      const crown=new THREE.BoxGeometry(w*1.1,1.4,w*1.1); crown.translate(0,h+2.4+.7,0); g.add(solid(crown,glassFill(),redLine()));
+      dist=44; lookY=11;
+    },
+    // BROOKLYN WATERFRONT -- perimeter blocks + waterfront towers + Manhattan skyline beyond
+    block(g){
+      ground(g,22);
+      // distant Manhattan skyline (one side)
+      for(let i=0;i<28;i++){const x=-17+i*1.25, h=4+Math.random()*13; g.add(setbackTower(x,-16,h,1+Math.random()*.5,Math.random()<.05));}
+      // East River
+      const water=new THREE.BoxGeometry(44,.02,9); water.translate(0,.01,-15.5); g.add(new THREE.Mesh(water,new THREE.MeshBasicMaterial({color:0xDCE2E6})));
+      // perimeter blocks (the neighbourhood)
+      for(let bx=-8;bx<=8;bx+=8){for(let bz=2;bz<=12;bz+=6){perimeterBlock(g,bx,bz,5,3);}}
+      // waterfront towers
+      [[-7,-6,12],[0,-7,15],[7,-6,12]].forEach(s=>{
+        const geo=new THREE.BoxGeometry(2.4,s[2],2.4); geo.translate(0,s[2]/2,0);
+        const t=solid(geo,softFill(),inkLine()); t.position.set(s[0],0,s[1]); g.add(t);
+        const cap=new THREE.BoxGeometry(2.5,.3,2.5); cap.translate(0,s[2],0); const c=solid(cap,redMesh(),redLine()); c.position.set(s[0],0,s[1]); g.add(c);
+      });
+      for(let i=0;i<5;i++) tree(-6+i*3,8,.8);
+      dist=46; lookY=6;
+    },
+    // HUDSON MUSEUM -- big roof on a forest of columns, in the city
+    pavilion(g){
+      ground(g,20);
+      skyline(g,{inner:11,outer:18,count:46,max:11});
+      const W=16,D=11,rh=4.6;
+      const deck=new THREE.BoxGeometry(W+2.4,.18,D+2.4); deck.translate(0,.09,0); g.add(solid(deck,softFill(),inkLine()));
+      for(let ix=-3;ix<=3;ix++)for(let iz=-2;iz<=2;iz++){const c=new THREE.BoxGeometry(.14,rh,.14); c.translate(ix*2.3,rh/2,iz*2.4); g.add(new THREE.Mesh(c,steelFill()));}
+      const inner=new THREE.BoxGeometry(8.6,2.9,5.8); inner.translate(0,1.55,0); g.add(solid(inner,glassFill(),redLine()));
+      const roof=new THREE.BoxGeometry(W,.5,D); roof.translate(0,rh+.25,0); g.add(solid(roof,softFill(),inkLine()));
+      tree(-W/2-1.8,4.2,1.1); tree(W/2+1.6,-3.4,1);
+      dist=30; lookY=3.2;
+    },
+    // LOWER MANHATTAN 2040 -- dense skyscraper grid around a central park (the void)
+    masterplan(g){
+      ground(g,22);
+      // central park (the void)
+      const park=new THREE.BoxGeometry(7,.05,9.5); park.translate(0,.03,0);
+      g.add(new THREE.Mesh(park,new THREE.MeshBasicMaterial({color:0xE9E9E5}))); g.add(edges(park,inkLine()));
+      for(let i=0;i<8;i++) tree(-2.6+(i%4)*1.7,-3.4+Math.floor(i/4)*6.6,.8);
+      // dense grid of skyscrapers around it
+      for(let bx=-15;bx<=15;bx+=3.8){for(let bz=-15;bz<=15;bz+=3.8){
+        if(Math.abs(bx)<4.6&&Math.abs(bz)<6) continue;
+        const d=Math.hypot(bx,bz), h=2.5+Math.pow(Math.max(0,1-d/24),1.4)*17*(.5+Math.random()*.7), w=1.7+Math.random()*.7;
+        g.add(setbackTower(bx+(Math.random()-.5),bz+(Math.random()-.5),h,w,Math.random()<.05));
+      }}
+      // waterfront dyke (red) on one edge
+      const quay=new THREE.BoxGeometry(32,.5,1.2); quay.translate(0,.25,16); g.add(new THREE.Mesh(quay,redMesh()));
+      dist=52; lookY=6;
     }
   };
-
   function resize(){
     const w=box.clientWidth,h=box.clientHeight;
     renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
@@ -2311,65 +2313,76 @@ document.addEventListener('keydown',e=>{
   const renderer=createRenderer(canvas);
   if(!renderer) return;
   const scene=new THREE.Scene();
-  scene.fog=new THREE.Fog(0xFFFFFF,28,78); // les lointains se fondent dans le papier
-  const camera=new THREE.PerspectiveCamera(42,1,.1,200);
-  const tallMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.55});
-  const lowMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.32});
+  scene.fog=new THREE.Fog(0xFFFFFF,34,92);
+  const camera=new THREE.PerspectiveCamera(44,1,.1,260);
+  const softMat=new THREE.MeshBasicMaterial({color:0xECECEA});
   const redMat=new THREE.MeshBasicMaterial({color:ROUGE});
-  const redLineMat=new THREE.LineBasicMaterial({color:ROUGE_VIF});
+  const edgeMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.5});
+  const edgeFaint=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.3});
+  const redEdge=new THREE.LineBasicMaterial({color:ROUGE_VIF});
+  function addBox(grp,w,h,d,y,red,faint){
+    const geo=new THREE.BoxGeometry(w,h,d); geo.translate(0,h/2+y,0);
+    grp.add(new THREE.Mesh(geo,red?redMat:softMat));
+    grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),red?redEdge:(faint?edgeFaint:edgeMat)));
+  }
+  const LITE=window.__svgFallback;   // mode sans WebGL : on allège la maquette
+  // Manhattan-style setback building (stacked, shrinking) + spire for talls
+  function building(gx,gz,h,w,red){
+    const grp=new THREE.Group();
+    const seg=LITE?1:(h>6?3:(h>3?2:1)); let y=0;
+    for(let i=0;i<seg;i++){const sh=h/seg, cw=w*(1-i*0.16); addBox(grp,cw,sh,cw,y,(red&&i===seg-1),h<2.4); y+=sh;}
+    if(!LITE&&h>7){const geo=new THREE.ConeGeometry(.07,h*.18,4); geo.translate(0,h,0); grp.add(new THREE.Mesh(geo,red?redMat:softMat));}
+    grp.position.set(gx,0,gz); grp.scale.y=.001; return grp;
+  }
   const buildings=[];
-  const N=14, SP=2.1, C=(N-1)/2;
-  const onBlvd=(x,z)=>Math.abs((x-C)-(z-C))<1.05;          // avenue diagonale
-  const inPark=(x,z)=>(x>N-5 && z<4);                        // parc : le vide
-  for(let x=0;x<N;x++)for(let z=0;z<N;z++){
-    if(onBlvd(x,z)||inPark(x,z))continue;
-    if(Math.random()<.14)continue;
-    const d=Math.hypot(x-C,z-C)/C;                           // 0 au centre → 1 au bord
-    const h=.6+Math.pow(Math.max(0,1-d),1.8)*9*(.55+Math.random()*.6)+Math.random()*1;
-    const w=1+Math.random()*.5;
-    const geo=new THREE.BoxGeometry(w,h,w); geo.translate(0,h/2,0);
-    const group=new THREE.Group();
-    const red=Math.random()<.06;
-    if(red)group.add(new THREE.Mesh(geo,redMat));
-    group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),red?redLineMat:(h>4?tallMat:lowMat)));
-    group.position.set((x-C)*SP,0,(z-C)*SP);
-    group.scale.y=.001; group.userData.delay=(x+z)*42+Math.random()*220;
-    scene.add(group); buildings.push(group);
+  const N=LITE?11:15, SP=2.05, C=(N-1)/2, maxd=Math.hypot(C,C);
+  // Central Park : the void
+  const inPark=(gx,gz)=>(gx>=2&&gx<=4&&gz>=-5&&gz<=4);
+  for(let xi=0;xi<N;xi++)for(let zi=0;zi<N;zi++){
+    const gx=(xi-C), gz=(zi-C);
+    if(inPark(gx,gz))continue;
+    if(Math.random()<.12)continue;
+    const d=Math.hypot(gx,gz)/maxd;
+    const h=1+Math.pow(Math.max(0,1-d),1.6)*18*(.45+Math.random()*.75)+Math.random()*.9;
+    const w=1.05+Math.random()*.55;
+    const red=Math.random()<.05;
+    const b=building(gx*SP,gz*SP,h,w,red);
+    b.userData.delay=(xi+zi)*38+Math.random()*240;
+    scene.add(b); buildings.push(b);
   }
-  // avenue rouge en diagonale
-  const blvd=new THREE.Mesh(new THREE.BoxGeometry(1,.05,N*SP*1.35),redMat);
-  blvd.rotation.y=-Math.PI/4; blvd.position.y=.03; scene.add(blvd);
-  // sol pointillé
+  // Central Park plate + trees (the void)
+  const parkMesh=new THREE.Mesh(new THREE.BoxGeometry(2.6*SP,.04,9.4*SP),new THREE.MeshBasicMaterial({color:0xF1F1EE}));
+  parkMesh.position.set(3*SP,.02,-0.5*SP); scene.add(parkMesh);
+  const parkEdge=new THREE.LineSegments(new THREE.EdgesGeometry(parkMesh.geometry),edgeFaint);
+  parkEdge.position.copy(parkMesh.position); scene.add(parkEdge);
+  for(let i=0;i<10;i++){
+    const t=new THREE.Group();
+    const cr=new THREE.ConeGeometry(.5,1.1,6); cr.translate(0,1,0);
+    t.add(new THREE.Mesh(cr,softMat)); t.add(new THREE.LineSegments(new THREE.EdgesGeometry(cr),edgeFaint));
+    t.position.set(3*SP+(Math.random()-.5)*2.2,0,(-0.5+ (i-4.5)*0.9)*SP); scene.add(t);
+  }
+  // dotted ground
   const pts=[];
-  for(let x=0;x<=N;x++)for(let z=0;z<=N;z++){
-    const cx=(x-C)*SP,cz=(z-C)*SP,s=.16;
-    pts.push(cx-s,0,cz,cx+s,0,cz,cx,0,cz-s,cx,0,cz+s);
-  }
-  const crossGeo=new THREE.BufferGeometry();
-  crossGeo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
-  scene.add(new THREE.LineSegments(crossGeo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.18})));
+  for(let x=0;x<=N;x++)for(let z=0;z<=N;z++){const cx=(x-C)*SP,cz=(z-C)*SP,s=.15;pts.push(cx-s,0,cz,cx+s,0,cz,cx,0,cz-s,cx,0,cz+s);}
+  const crossGeo=new THREE.BufferGeometry(); crossGeo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+  scene.add(new THREE.LineSegments(crossGeo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.16})));
   let mouseX=0;
   window.addEventListener('mousemove',e=>{mouseX=(e.clientX/window.innerWidth-.5);},{passive:true});
   const t0=performance.now();
-  function resize(){
-    const el=renderer.domElement, w=el.parentElement.clientWidth, h=el.parentElement.clientHeight;
-    renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
-  }
+  function resize(){const el=renderer.domElement,w=el.parentElement.clientWidth,h=el.parentElement.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
   window.addEventListener('resize',resize);resize();
   function frame(t){
     const el=t-t0;
-    buildings.forEach(b=>{
-      const k=Math.max(0,Math.min(1,(el-b.userData.delay)/900));
-      b.scale.y=.001+(1-Math.pow(1-k,3))*.999;
-    });
+    buildings.forEach(b=>{const k=Math.max(0,Math.min(1,(el-b.userData.delay)/950));b.scale.y=.001+(1-Math.pow(1-k,3))*.999;});
     const heroH=document.querySelector('.hero').offsetHeight;
     const p=Math.min(1,window.scrollY/(heroH*1.1));
-    const angle=-.5+p*1.4+(reduceMotion?0:mouseX*.22);
-    const radius=30-p*8, height=6.5+p*16;
+    const auto=reduceMotion?0:el*0.00005;
+    const angle=-.35+auto+p*1.1+(reduceMotion?0:mouseX*.2);
+    const radius=30-p*8, height=5.5+p*15;
     camera.position.set(Math.sin(angle)*radius,height,Math.cos(angle)*radius);
-    camera.lookAt(0,3,0);
+    camera.lookAt(0,6,0);
     renderer.render(scene,camera);
-    if(!reduceMotion)requestAnimationFrame(frame);
+    requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 })();
@@ -2385,132 +2398,129 @@ document.addEventListener('keydown',e=>{
   const renderer=createRenderer(canvas);
   if(!renderer) return;
   const scene=new THREE.Scene();
-  scene.fog=new THREE.Fog(0x0E0E0E,28,72); // brume de profondeur
-  const camera=new THREE.PerspectiveCamera(38,1,.1,200);
+  scene.fog=new THREE.Fog(0x0E0E0E,34,90);
+  const camera=new THREE.PerspectiveCamera(40,1,.1,260);
+  const cl=v=>Math.max(0,Math.min(1,v));
 
-  const whiteLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.9});
-  const greyLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.32});
+  // color-coded construction systems (strong contrast on dark bg)
+  const concreteMat=new THREE.MeshBasicMaterial({color:0x4A4A4E});
+  const steelMat=new THREE.MeshBasicMaterial({color:0x8A93A0});
+  const whiteMat=new THREE.MeshBasicMaterial({color:0xFFFFFF});
+  const redMat=new THREE.MeshBasicMaterial({color:ROUGE});
   const redLine=new THREE.LineBasicMaterial({color:ROUGE_VIF});
-  const slabFill=new THREE.MeshBasicMaterial({color:0xF2F2F0});   // plateaux pleins (opaques)
-  const slabRedFill=new THREE.MeshBasicMaterial({color:ROUGE});
+  const whiteLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.55});
+  const greyLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.28});
+  const glassMat=new THREE.MeshBasicMaterial({color:0x9CC2DA,transparent:true,opacity:0,side:THREE.DoubleSide});
+  const E=(geo,m)=>new THREE.LineSegments(new THREE.EdgesGeometry(geo),m);
 
-  const FLOORS=40, FH=.55, HALF=3;
-  const slabs=[];
-  const slabGeoA=new THREE.BoxGeometry(HALF*2,FH*.82,HALF*2);
-  const slabGeoB=new THREE.BoxGeometry(HALF*1.74,FH*.82,HALF*1.74);
+  const FLOORS=26, FH=.62, HALF=2.7, BO=.55, H=FLOORS*FH;
+  const corners=[[HALF,HALF],[HALF,-HALF],[-HALF,-HALF],[-HALF,HALF]];
+
+  // 1) FONDATIONS : radier sombre + fosse rouge
+  const found=new THREE.Group();
+  const pad=new THREE.BoxGeometry(HALF*2.5,BO,HALF*2.5); pad.translate(0,BO/2,0);
+  found.add(new THREE.Mesh(pad,concreteMat)); found.add(E(pad,whiteLine));
+  const pit=new THREE.BoxGeometry(HALF*2.2,.9,HALF*2.2); pit.translate(0,-.4,0);
+  found.add(E(pit,redLine));
+  corners.forEach(c=>{const f=new THREE.BoxGeometry(.5,.5,.5);f.translate(c[0]*.8,.25,c[1]*.8);found.add(new THREE.Mesh(f,concreteMat));});
+  scene.add(found);
+
+  // 2) NOYAU : tube béton rouge
+  const coreGeo=new THREE.CylinderGeometry(.92,.92,H,16); coreGeo.translate(0,H/2+BO,0);
+  const core=new THREE.Mesh(coreGeo,redMat); const coreE=E(coreGeo,redLine);
+  scene.add(core,coreE);
+
+  // 3-5) par étage : planchers (blanc), poteaux (acier), façade (verre)
+  const slabs=[],cols=[],pans=[];
+  const slabGeo=new THREE.BoxGeometry(HALF*2,FH*.16,HALF*2);
+  const colGeo=new THREE.BoxGeometry(.2,FH,.2);
+  const panGeo=new THREE.BoxGeometry(HALF*2*.99,FH*.92,HALF*2*.99);
   for(let i=0;i<FLOORS;i++){
-    const g=new THREE.Group();
-    const isRed=(i%8===0);
-    const geo=(i%2===0)?slabGeoA:slabGeoB;
-    g.add(new THREE.Mesh(geo,isRed?slabRedFill:slabFill));   // plateau plein
-    g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),isRed?redLine:whiteLine));
-    g.position.y=i*FH; scene.add(g); slabs.push(g);
+    const y=BO+(i+1)*FH;
+    const sl=new THREE.Group(); sl.add(new THREE.Mesh(slabGeo,whiteMat)); sl.add(E(slabGeo,greyLine));
+    sl.position.y=y; sl.visible=false; scene.add(sl); slabs.push(sl);
+    const cg=new THREE.Group();
+    corners.forEach(c=>{const m=new THREE.Mesh(colGeo,steelMat); m.position.set(c[0],BO+(i+.5)*FH,c[1]); cg.add(m);});
+    cg.visible=false; scene.add(cg); cols.push(cg);
+    const pn=new THREE.Mesh(panGeo,glassMat.clone()); pn.position.y=BO+(i+.5)*FH; pn.visible=false; scene.add(pn); pans.push(pn);
   }
 
-  // NOYAU central rouge — plein et opaque
-  const coreGeo=new THREE.CylinderGeometry(1.05,1.05,FLOORS*FH,16);
-  coreGeo.translate(0,FLOORS*FH/2,0);
-  const core=new THREE.Mesh(coreGeo,new THREE.MeshBasicMaterial({color:ROUGE}));
-  const coreEdges=new THREE.LineSegments(new THREE.EdgesGeometry(coreGeo),redLine);
-  scene.add(core); scene.add(coreEdges);
+  // 6) COURONNEMENT : couronne + flèche rouge
+  const crown=new THREE.Group();
+  const cb=new THREE.BoxGeometry(HALF*1.5,FH*1.6,HALF*1.5); cb.translate(0,0,0);
+  crown.add(new THREE.Mesh(cb,whiteMat)); crown.add(E(cb,redLine));
+  const sp=new THREE.CylinderGeometry(.04,.3,3.4,6); sp.translate(0,FH*.8+1.7,0); crown.add(new THREE.Mesh(sp,redMat));
+  crown.position.y=BO+H+FH*.8; crown.visible=false; scene.add(crown);
 
-  // SOCLE / podium d'entrée
-  const podGeo=new THREE.BoxGeometry(HALF*2.6,FH*2.4,HALF*2.6); podGeo.translate(0,FH*1.2,0);
-  const podium=new THREE.Group();
-  podium.add(new THREE.Mesh(podGeo,slabFill));
-  podium.add(new THREE.LineSegments(new THREE.EdgesGeometry(podGeo),whiteLine));
-  scene.add(podium);
+  // bande rouge "niveau en chantier"
+  const bandGeo=new THREE.BoxGeometry(HALF*2.1,.16,HALF*2.1);
+  const band=new THREE.Mesh(bandGeo,redMat); scene.add(band);
 
-  // ANTENNE / couronne (révélée en fin de construction)
-  const antGeo=new THREE.CylinderGeometry(.05,.05,3.2,6); antGeo.translate(0,FLOORS*FH+1.6,0);
-  const antenna=new THREE.Mesh(antGeo,new THREE.MeshBasicMaterial({color:ROUGE_VIF}));
-  scene.add(antenna);
+  // GRUE de chantier rouge
+  const crane=new THREE.Group();
+  const mastGeo=new THREE.BoxGeometry(.22,H+4,.22); mastGeo.translate(0,(H+4)/2,0);
+  crane.add(new THREE.Mesh(mastGeo,steelMat)); crane.add(E(mastGeo,redLine));
+  const jib=new THREE.BoxGeometry(11,.2,.2); jib.translate(3.2,H+3.6,0); crane.add(new THREE.Mesh(jib,redMat));
+  const cjib=new THREE.BoxGeometry(3,.2,.2); cjib.translate(-1.2,H+3.6,0); crane.add(new THREE.Mesh(cjib,steelMat));
+  crane.position.set(HALF+4.5,0,1); scene.add(crane);
 
-  // ARÊTES VERTICALES CONTINUES (résille de façade torsadée, 8 montants, recalculée chaque image)
-  const corners=[[HALF,HALF],[HALF,0],[HALF,-HALF],[0,-HALF],[-HALF,-HALF],[-HALF,0],[-HALF,HALF],[0,HALF]];
-  const segs=(FLOORS-1)*corners.length;
-  const edgePos=new Float32Array(segs*2*3);
-  const edgeGeo=new THREE.BufferGeometry();
-  edgeGeo.setAttribute('position',new THREE.BufferAttribute(edgePos,3));
-  const edgeLines=new THREE.LineSegments(edgeGeo,greyLine);
-  scene.add(edgeLines);
-  const tmp=new THREE.Vector3();
-
-  // sol pointillé + anneau de chantier
+  // sol pointillé + emprise
   const gpts=[];
-  for(let i=0;i<260;i++){
-    const a=Math.random()*Math.PI*2,r=6+Math.random()*16;
-    gpts.push(Math.cos(a)*r,0,Math.sin(a)*r,Math.cos(a)*r,.06,Math.sin(a)*r);
-  }
-  const gGeo=new THREE.BufferGeometry();
-  gGeo.setAttribute('position',new THREE.Float32BufferAttribute(gpts,3));
-  scene.add(new THREE.LineSegments(gGeo,new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.3})));
-  const ringGeo=new THREE.RingGeometry(7.6,7.75,48,1,0,Math.PI*1.6);
-  ringGeo.rotateX(-Math.PI/2); ringGeo.translate(0,.04,0);
-  const ring=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:ROUGE_VIF,side:THREE.DoubleSide}));
-  scene.add(ring);
+  for(let i=0;i<240;i++){const a=Math.random()*Math.PI*2,r=5+Math.random()*15;gpts.push(Math.cos(a)*r,0,Math.sin(a)*r,Math.cos(a)*r,.05,Math.sin(a)*r);}
+  const gGeo=new THREE.BufferGeometry(); gGeo.setAttribute('position',new THREE.Float32BufferAttribute(gpts,3));
+  scene.add(new THREE.LineSegments(gGeo,new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.25})));
 
   const phaseLabel=document.getElementById('phaseLabel');
   const tourBar=document.getElementById('tourBar');
-  const phases=['Phase 01 — Noyau 核','Phase 02 — Plateaux','Phase 03 — Torsion 捻り','Phase 04 — Komorebi 木漏れ日'];
+  const phases=['Étape 01 — Fondations 基礎','Étape 02 — Noyau 核','Étape 03 — Planchers 床','Étape 04 — Structure 骨','Étape 05 — Façade 外装','Étape 06 — Couronnement 完成'];
+  const stepEls=[...document.querySelectorAll('.tour-steps li')];
   let lastPhase=-1, smoothP=0;
 
-  function resize(){
-    const el=renderer.domElement, w=el.parentElement.clientWidth, h=el.parentElement.clientHeight;
-    renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
-  }
+  function resize(){const el=renderer.domElement,w=el.parentElement.clientWidth,h=el.parentElement.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
   window.addEventListener('resize',resize);resize();
+
+  function reveal(p,a,b,i){return cl(((p-a)/(b-a))*FLOORS-i);}
 
   function frame(){
     const rect=wrap.getBoundingClientRect();
     const total=rect.height-window.innerHeight;
-    const raw=Math.max(0,Math.min(1,-rect.top/total));
-    smoothP+=(raw-smoothP)*.09; // lissage du scroll
-    const p=smoothP;
+    const raw=cl(-rect.top/total);
+    smoothP+=(raw-smoothP)*.09; const p=smoothP;
 
-    const coreRise=Math.min(1,p/.22);
-    const rise=Math.max(0,Math.min(1,(p-.12)/.4));
-    const twist=Math.max(0,(p-.42)/.58)*.16;
-    const breathe=Math.max(0,(p-.6)/.4);
-
-    core.scale.y=Math.max(.001,coreRise); coreEdges.scale.y=core.scale.y;
-
-    slabs.forEach((s,i)=>{
-      const k=Math.max(0,Math.min(1,rise*FLOORS-i));
-      const e=1-Math.pow(1-k,3);
-      s.position.y=i*FH*e;
-      const taper=1-(i/FLOORS)*.14; // léger fuselage
-      s.scale.set((.25+.75*e)*taper,1,(.25+.75*e)*taper);
-      s.rotation.y=i*twist+(reduceMotion?0:Math.sin(performance.now()/1600+i*.3)*breathe*.05);
-      s.position.x=breathe*Math.sin(i*.7)*.5;
-      s.visible=e>.02;
-    });
-
-    // mise à jour de la résille torsadée (8 montants)
-    let w=0;
-    for(let i=0;i<FLOORS-1;i++){
-      for(let c=0;c<corners.length;c++){
-        const a=slabs[i],b=slabs[i+1];
-        tmp.set(corners[c][0],0,corners[c][1]).applyEuler(a.rotation).multiply(a.scale).add(a.position);
-        edgePos[w++]=tmp.x;edgePos[w++]=tmp.y;edgePos[w++]=tmp.z;
-        tmp.set(corners[c][0],0,corners[c][1]).applyEuler(b.rotation).multiply(b.scale).add(b.position);
-        edgePos[w++]=tmp.x;edgePos[w++]=tmp.y;edgePos[w++]=tmp.z;
-      }
+    // étape 1 : fondations
+    const foundP=cl(p/.10); found.scale.setScalar(.6+.4*foundP); found.visible=foundP>.01;
+    // étape 2 : noyau
+    const coreP=cl((p-.10)/.18); core.scale.y=Math.max(.001,coreP); coreE.scale.y=core.scale.y;
+    // par étage
+    let topY=BO+coreP*H, built=0;
+    for(let i=0;i<FLOORS;i++){
+      const sR=reveal(p,.26,.52,i);
+      slabs[i].visible=sR>.02; slabs[i].scale.set(sR,1,sR);
+      const cR=reveal(p,.50,.70,i);
+      cols[i].visible=cR>.02; cols[i].scale.y=Math.max(.001,cR);
+      const fR=reveal(p,.68,.90,i);
+      pans[i].visible=fR>.02; pans[i].material.opacity=.5*fR;
+      if(sR>.5){built=i+1; topY=BO+(i+1)*FH;}
     }
-    edgeGeo.attributes.position.needsUpdate=true;
-    edgeLines.visible=p>.18;
-    greyLine.opacity=.1+Math.min(.45,p*.6);
+    // étape 6 : couronnement
+    const crownP=cl((p-.90)/.10); crown.visible=crownP>.02; crown.scale.setScalar(.4+.6*crownP);
+    if(crownP>.3) topY=BO+H+FH;
 
-    antenna.visible=rise>.985;
-    ring.rotation.y=performance.now()/4000;
+    // bande "en chantier" au front de construction
+    const buildingNow=p>.26&&p<.9;
+    band.visible=buildingNow; band.position.y=topY;
 
-    const angle=.6+p*2.4, camH=4+p*16, radius=27-p*7;
+    // grue : visible pendant le chantier
+    crane.visible=p<.93;
+
+    // caméra suit le sommet construit
+    const angle=.5+p*2.2, radius=24-p*3, camH=3+topY*.5;
     camera.position.set(Math.sin(angle)*radius,camH,Math.cos(angle)*radius);
-    camera.lookAt(0,Math.max(2,(FLOORS*FH*rise)/2),0);
+    camera.lookAt(0,topY*.55,0);
     renderer.render(scene,camera);
 
-    const ph=Math.min(3,Math.floor(raw*4));
-    if(ph!==lastPhase){phaseLabel.textContent=phases[ph];lastPhase=ph;}
+    const ph=Math.min(5,Math.floor(raw*6));
+    if(ph!==lastPhase){phaseLabel.textContent=phases[ph];stepEls.forEach((el,k)=>el.classList.toggle('active',k===ph));lastPhase=ph;}
     tourBar.style.width=(raw*100)+'%';
     requestAnimationFrame(frame);
   }
