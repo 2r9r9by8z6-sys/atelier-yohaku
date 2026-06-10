@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atelier Yohaku — Architecture &amp; Urbanisme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFFFFF;
+  --ink:#0E0E0E;
+  --rouge:#7A0E14;
+  --rouge-vif:#9E1620;
+  --rouge-soft:#F4E5E4;
+  --gris:#EDEDEB;
+  --display:'Shippori Mincho',serif;
+  --body:'Zen Kaku Gothic New',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+section[id], header[id]{scroll-margin-top:90px}
+body{font-family:var(--body);background:var(--paper);color:var(--ink);overflow-x:hidden;line-height:1.7}
+body.modal-open{overflow:hidden}
+
+.dots{background-image:radial-gradient(var(--ink) 1px, transparent 1.4px);background-size:9px 9px}
+
+/* ====== RAIL ====== */
+.rail{position:fixed;top:0;right:46px;width:14px;height:100vh;z-index:30;pointer-events:none}
+.rail::before{content:'';position:absolute;inset:0 5px;background:repeating-linear-gradient(to bottom, var(--ink) 0 10px, transparent 10px 18px);opacity:.22}
+.rail-fill{position:absolute;top:0;left:0;width:100%;height:0%;background:repeating-linear-gradient(135deg, var(--rouge) 0 6px, var(--ink) 6px 8px)}
+.rail-marker{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);width:30px;height:30px;background:var(--rouge);border:2px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:var(--paper)}
+
+/* ====== NAV ====== */
+nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:space-between;align-items:center;padding:18px 90px 18px 48px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1.5px dashed var(--ink)}
+.logo{font-family:var(--display);font-weight:800;font-size:1.2rem;letter-spacing:.05em;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.logo .plus{color:var(--rouge);font-size:1.5rem;font-weight:800}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{text-decoration:none;color:var(--ink);font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;position:relative;padding-bottom:3px}
+.nav-links a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--rouge);transition:width .3s}
+.nav-links a:hover::after,.nav-links a.current::after{width:100%}
+.nav-links a .jp{color:var(--rouge);margin-right:6px;font-weight:500}
+.burger{display:none;background:none;border:2px solid var(--ink);width:42px;height:42px;cursor:pointer;flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.burger span{display:block;width:20px;height:2px;background:var(--ink);transition:transform .3s,opacity .3s}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{display:none;position:fixed;top:79px;left:0;right:0;z-index:55;background:var(--paper);border-bottom:2px solid var(--ink);flex-direction:column;list-style:none;transform:translateY(-110%);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.mobile-menu.open{transform:translateY(0)}
+.mobile-menu a{display:block;padding:18px 24px;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border-bottom:1.5px dashed var(--ink)}
+.mobile-menu a .jp{color:var(--rouge);margin-right:10px}
+
+/* ====== HERO ====== */
+.hero{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;padding:130px 110px 70px 48px;position:relative;overflow:hidden}
+#cityCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.hero > div, .hero > aside{position:relative;z-index:2}
+.eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.eyebrow::before{content:'';width:48px;height:2px;background:var(--rouge)}
+.eyebrow .jp{color:var(--rouge);letter-spacing:.1em}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,5.6vw,4.9rem);line-height:1.12;letter-spacing:.01em}
+h1 .accent{position:relative;white-space:nowrap;color:var(--paper)}
+h1 .accent::after{content:'';position:absolute;left:-3px;right:-3px;top:.14em;bottom:.14em;background:var(--ink);z-index:-1;transform-origin:left;animation:paint 1s .5s cubic-bezier(.7,0,.2,1) backwards}
+@keyframes paint{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hero p{margin-top:28px;max-width:44ch;font-size:1.02rem;color:#333;background:rgba(255,255,255,.7);backdrop-filter:blur(2px)}
+.hero-actions{margin-top:40px;display:flex;gap:18px;flex-wrap:wrap}
+.btn{font-family:var(--body);font-size:.74rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:16px 30px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:transform .25s, box-shadow .25s, background .25s, color .25s}
+.btn:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--rouge)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--rouge);color:var(--paper);border-color:var(--ink)}
+.scroll-hint{position:absolute;bottom:26px;left:48px;z-index:2;font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:12px;color:#555}
+.scroll-hint .line{width:2px;height:40px;background:var(--ink);position:relative;overflow:hidden}
+.scroll-hint .line::after{content:'';position:absolute;left:0;top:-100%;width:100%;height:100%;background:var(--rouge);animation:slide 1.8s infinite}
+@keyframes slide{to{top:100%}}
+.hero-card{justify-self:end;width:min(330px,100%);border:2px solid var(--ink);background:var(--paper);padding:26px;position:relative;transform:rotate(1.5deg)}
+.hero-card::before{content:'';position:absolute;inset:-14px auto auto -14px;width:100%;height:100%;border:1.5px dashed var(--ink);z-index:-1}
+.hero-card .tag{position:absolute;top:-14px;right:18px;background:var(--rouge);color:var(--paper);border:2px solid var(--ink);font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:5px 12px}
+.hero-card h3{font-family:var(--display);font-size:1.1rem;margin-bottom:6px}
+.hero-card .meta{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:#666}
+.photo{position:relative;overflow:hidden;border:1.5px solid var(--ink);margin-top:16px}
+.photo img{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.12);transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.photo::after{content:'';position:absolute;inset:0;background:var(--rouge);mix-blend-mode:multiply;opacity:0;transition:opacity .45s}
+.photo:hover img{transform:scale(1.06)}
+.photo:hover::after{opacity:.45}
+.photo .ph-label{position:absolute;bottom:0;left:0;background:var(--ink);color:var(--paper);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;padding:5px 10px;z-index:2}
+
+/* ====== SECTIONS ====== */
+section{padding:110px 110px 110px 48px;position:relative}
+.sec-head{display:flex;align-items:baseline;gap:22px;margin-bottom:14px;flex-wrap:wrap}
+.sec-num{font-size:.72rem;font-weight:700;letter-spacing:.25em;border:1.5px solid var(--ink);padding:6px 12px;background:var(--rouge-soft)}
+h2{font-family:var(--display);font-weight:800;font-size:clamp(1.9rem,3.6vw,3rem)}
+h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter-spacing:.1em}
+.sec-sub{max-width:60ch;color:#444;margin-bottom:54px}
+
+/* ====== LÉGENDE ====== */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:44px}
+.legend button{font-family:var(--body);font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:10px 18px 10px 14px;border:1.5px solid var(--ink);background:var(--paper);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .25s, color .25s, transform .2s}
+.legend button:hover{transform:translateY(-2px)}
+.legend button.active{background:var(--rouge);color:var(--paper)}
+.legend button.active .swatch{border-color:var(--paper)}
+.swatch{width:16px;height:16px;border:1.5px solid var(--ink);display:inline-block;background:var(--paper)}
+.sw-dots{background-image:radial-gradient(var(--ink) 1px, transparent 1.2px);background-size:5px 5px}
+.sw-hatch{background-image:repeating-linear-gradient(45deg,var(--rouge) 0 3px,transparent 3px 6px)}
+.sw-plein{background:var(--ink)}
+.sw-rouge{background:var(--rouge)}
+
+/* ====== PROJETS ====== */
+.projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:34px}
+.project{border:2px solid var(--ink);background:var(--paper);position:relative;cursor:pointer;transition:transform .3s, box-shadow .3s;animation:cardIn .5s cubic-bezier(.2,.7,.2,1) backwards}
+@keyframes cardIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+.project.filtered-out{display:none}
+.project:hover{transform:translate(-4px,-4px);box-shadow:7px 7px 0 var(--rouge)}
+.project .thumb{height:210px;border-bottom:2px solid var(--ink);position:relative;overflow:hidden}
+.project .thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) contrast(1.15);transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.project .thumb::after{content:'';position:absolute;inset:0;background:var(--rouge);mix-blend-mode:multiply;opacity:0;transition:opacity .45s}
+.project:hover .thumb img{transform:scale(1.07)}
+.project:hover .thumb::after{opacity:.5}
+.project .thumb .open-hint{position:absolute;top:12px;right:12px;z-index:3;background:var(--paper);border:1.5px solid var(--ink);font-size:.56rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:5px 10px;opacity:0;transform:translateY(-6px);transition:opacity .3s, transform .3s}
+.project:hover .thumb .open-hint{opacity:1;transform:none}
+.project .thumb.fallback{background-image:radial-gradient(var(--ink) 1px, transparent 1.4px);background-size:9px 9px}
+.project .body{padding:24px}
+.project .cat{font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--paper);background:var(--rouge);border:1.5px solid var(--ink);display:inline-block;padding:3px 10px;margin-bottom:12px}
+.project h3{font-family:var(--display);font-size:1.25rem;margin-bottom:8px}
+.project .desc{font-size:.88rem;color:#444}
+.project .foot{display:flex;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1.5px dashed var(--ink);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.project .arrow{transition:transform .3s}
+.project:hover .arrow{transform:translateX(6px)}
+.empty-msg{display:none;border:1.5px dashed var(--ink);padding:30px;text-align:center;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:#666}
+.empty-msg.show{display:block}
+
+/* ====== FICHE PROJET (modale plein écran) ====== */
+.pmodal{position:fixed;inset:0;z-index:100;background:var(--paper);display:none;flex-direction:column;opacity:0;transition:opacity .35s}
+.pmodal.open{display:flex}
+.pmodal.visible{opacity:1}
+.pm-top{display:flex;justify-content:space-between;align-items:center;padding:16px 48px;border-bottom:2px solid var(--ink);background:var(--paper);flex-shrink:0}
+.pm-top .crumb{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
+.pm-top .crumb .jp{color:var(--rouge)}
+.pm-nav{display:flex;gap:10px;align-items:center}
+.pm-btn{font-family:var(--body);font-size:.66rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;border:2px solid var(--ink);background:var(--paper);padding:10px 16px;cursor:pointer;transition:background .25s,color .25s}
+.pm-btn:hover{background:var(--rouge);color:var(--paper)}
+.pm-btn.close{background:var(--ink);color:var(--paper)}
+.pm-btn.close:hover{background:var(--rouge)}
+.pm-scroll{overflow-y:auto;flex:1}
+.pm-hero{display:grid;grid-template-columns:1.1fr .9fr;border-bottom:2px solid var(--ink)}
+.pm-hero .pm-photo{position:relative;min-height:380px;border-right:2px solid var(--ink);overflow:hidden}
+.pm-hero .pm-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.15)}
+.pm-hero .pm-photo .ph-label{position:absolute;bottom:0;left:0;background:var(--ink);color:var(--paper);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;padding:6px 12px}
+.pm-hero .pm-photo.fallback{background-image:radial-gradient(var(--ink) 1px, transparent 1.4px);background-size:9px 9px}
+.pm-title{padding:46px 48px;display:flex;flex-direction:column;justify-content:center}
+.pm-title .cat{font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--paper);background:var(--rouge);border:1.5px solid var(--ink);display:inline-block;padding:4px 12px;margin-bottom:16px;align-self:flex-start}
+.pm-title h2{font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:1.15}
+.pm-title .lieu{margin-top:12px;font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:#666}
+.pm-body{display:grid;grid-template-columns:.95fr 1.05fr;gap:0}
+.pm-left{padding:46px 48px;border-right:2px dashed var(--ink)}
+.pm-right{padding:46px 48px}
+.pm-h{font-family:var(--display);font-size:1.15rem;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.pm-h .jp{color:var(--rouge);font-weight:500;font-size:.85em}
+.specs{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--ink);margin-bottom:40px}
+.spec{padding:16px 18px;border-bottom:1.5px dashed var(--ink)}
+.spec:nth-child(odd){border-right:1.5px dashed var(--ink)}
+.spec:nth-last-child(-n+2){border-bottom:none}
+.spec .k{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:#777}
+.spec .v{font-family:var(--display);font-weight:700;font-size:1rem;margin-top:3px}
+.pm-desc p{margin-bottom:14px;color:#333;max-width:60ch}
+/* chronologie */
+.tl{border-left:2px solid var(--ink);margin:8px 0 40px 8px}
+.tl-item{position:relative;padding:0 0 30px 38px}
+.tl-item:last-child{padding-bottom:4px}
+.tl-item::before{content:'';position:absolute;left:-9px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+.tl-item.done::before{background:var(--ink)}
+.tl-item.now::before{background:var(--rouge);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(122,14,20,.45)}50%{box-shadow:0 0 0 7px rgba(122,14,20,0)}}
+.tl-item .d{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--rouge)}
+.tl-item .l{font-family:var(--display);font-weight:700}
+.tl-item .t{font-size:.84rem;color:#555}
+/* visionneuse 3D */
+.viewer{border:2px solid var(--ink);position:relative;height:430px;background:var(--paper);overflow:hidden;cursor:grab}
+.viewer:active{cursor:grabbing}
+.viewer canvas{width:100%;height:100%;display:block}
+.viewer .v-hint{position:absolute;bottom:12px;left:12px;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;background:var(--paper);border:1.5px solid var(--ink);padding:5px 10px;pointer-events:none}
+.viewer .v-tag{position:absolute;top:-2px;right:14px;background:var(--rouge);color:var(--paper);border:2px solid var(--ink);font-size:.56rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:5px 10px}
+.v-controls{display:flex;gap:10px;margin-top:14px}
+.v-controls button{font-family:var(--body);font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;border:1.5px solid var(--ink);background:var(--paper);padding:8px 14px;cursor:pointer;transition:background .25s,color .25s}
+.v-controls button:hover,.v-controls button.on{background:var(--rouge);color:var(--paper)}
+
+/* ====== SECTION TOUR ====== */
+.tour3d{padding:0;background:var(--ink);color:var(--paper)}
+.tour-wrap{height:320vh;position:relative}
+.tour-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center}
+#towerCanvas{position:absolute;inset:0;width:100%;height:100%}
+.tour-copy{position:relative;z-index:2;padding:0 110px 0 48px;max-width:560px;pointer-events:none}
+.tour-copy .sec-num{border-color:var(--paper);background:transparent;color:var(--paper)}
+.tour-copy h2{margin:16px 0 14px}
+.tour-copy h2 .jp{color:var(--rouge-vif)}
+.tour-copy p{color:#c9c9c9;max-width:42ch}
+.tour-phase{margin-top:30px;font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;font-weight:700;border:1.5px solid var(--paper);display:inline-flex;align-items:center;gap:12px;padding:9px 16px}
+.tour-phase .dot{width:10px;height:10px;border-radius:50%;background:var(--rouge-vif);animation:blink 1.6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.tour-progress{position:absolute;bottom:30px;left:48px;right:110px;z-index:2;height:3px;background:rgba(255,255,255,.18)}
+.tour-progress .bar{height:100%;width:0%;background:var(--rouge-vif)}
+
+/* ====== ATELIER / DÉMARCHE / CONTACT / FOOTER ====== */
+.atelier{background:var(--paper)}
+.atelier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));border:2px solid var(--ink);margin-top:50px}
+.stat{padding:38px 30px;border-right:1.5px dashed var(--ink);transition:background .3s}
+.stat:last-child{border-right:none}
+.stat:hover{background:var(--rouge-soft)}
+.stat .num{font-family:var(--display);font-size:3rem;font-weight:800;color:var(--rouge);line-height:1}
+.stat .lab{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;margin-top:12px;color:#555}
+.steps{display:grid;border-left:2px solid var(--ink);margin-left:8px}
+.step{position:relative;padding:0 0 52px 46px}
+.step:last-child{padding-bottom:6px}
+.step::before{content:'+';position:absolute;left:-15px;top:-2px;width:28px;height:28px;background:var(--rouge);color:var(--paper);border:2px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
+.step h3{font-family:var(--display);font-size:1.3rem;margin-bottom:8px}
+.step h3 .jp{color:var(--rouge);font-size:.75em;font-weight:500;margin-left:10px}
+.step p{max-width:62ch;color:#444}
+.contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+.contact-card{border:2px solid var(--ink);padding:36px;position:relative;background:var(--paper)}
+.contact-card::after{content:'';position:absolute;inset:12px -12px -12px 12px;background:repeating-linear-gradient(45deg,var(--rouge) 0 5px,transparent 5px 12px);z-index:-1}
+.field{margin-bottom:22px}
+.field label{display:block;font-size:.66rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+.field input,.field textarea{width:100%;font-family:var(--body);font-size:.95rem;padding:13px 14px;border:1.5px solid var(--ink);background:var(--gris);outline:none;transition:background .25s, box-shadow .25s}
+.field input:focus,.field textarea:focus{background:var(--paper);box-shadow:4px 4px 0 var(--rouge)}
+.field.error input,.field.error textarea{border-color:var(--rouge);background:var(--rouge-soft)}
+.field .err{display:none;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rouge);margin-top:5px;font-weight:700}
+.field.error .err{display:block}
+.contact-info p{margin-bottom:20px;max-width:46ch;color:#444}
+.coord{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.coord .plus{color:var(--rouge);font-size:1.1rem}
+.toast{margin-top:14px;border:1.5px solid var(--ink);background:var(--rouge);color:var(--paper);padding:12px 16px;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:0;transform:translateY(8px);transition:opacity .4s, transform .4s}
+.toast.show{opacity:1;transform:translateY(0)}
+footer{border-top:2px solid var(--ink);padding:34px 110px 34px 48px;display:flex;justify-content:space-between;align-items:center;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;flex-wrap:wrap;gap:14px}
+footer .jp{color:var(--rouge)}
+
+/* ====== RÉVÉLATION ====== */
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .8s cubic-bezier(.2,.6,.2,1), transform .8s cubic-bezier(.2,.6,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.12s}
+.reveal.d2{transition-delay:.24s}
+.reveal.d3{transition-delay:.36s}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none}
+}
+
+@media (max-width:960px){
+  .rail{display:none}
+  nav{padding:16px 22px}
+  .nav-links{display:none}
+  .burger{display:flex}
+  .mobile-menu{display:flex}
+  .hero{grid-template-columns:1fr;padding:120px 22px 90px;gap:46px}
+  .hero-card{justify-self:start}
+  .scroll-hint{left:22px}
+  section{padding:80px 22px}
+  .tour-copy{padding:0 22px}
+  .tour-progress{left:22px;right:22px}
+  .contact-wrap{grid-template-columns:1fr}
+  footer{padding:28px 22px}
+  .pm-top{padding:14px 22px}
+  .pm-hero{grid-template-columns:1fr}
+  .pm-hero .pm-photo{border-right:none;border-bottom:2px solid var(--ink);min-height:260px}
+  .pm-title{padding:32px 22px}
+  .pm-body{grid-template-columns:1fr}
+  .pm-left{border-right:none;border-bottom:2px dashed var(--ink)}
+  .pm-left,.pm-right{padding:34px 22px}
+  .viewer{height:340px}
+}
+</style>
+</head>
+<body>
+
+<div class="rail" aria-hidden="true">
+  <div class="rail-fill" id="railFill"></div>
+  <div class="rail-marker" id="railMarker">+</div>
+</div>
+
+<nav>
+  <a class="logo" href="#top"><span class="plus">+</span>ATELIER YOHAKU<span style="color:var(--rouge);font-weight:500">余白</span></a>
+  <ul class="nav-links">
+    <li><a href="#projets"><span class="jp">作</span>Projets</a></li>
+    <li><a href="#volume"><span class="jp">塔</span>Volume</a></li>
+    <li><a href="#atelier"><span class="jp">所</span>Atelier</a></li>
+    <li><a href="#demarche"><span class="jp">道</span>Démarche</a></li>
+    <li><a href="#contact"><span class="jp">話</span>Contact</a></li>
+  </ul>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+<ul class="mobile-menu" id="mobileMenu">
+  <li><a href="#projets"><span class="jp">作</span>Projets</a></li>
+  <li><a href="#volume"><span class="jp">塔</span>Volume</a></li>
+  <li><a href="#atelier"><span class="jp">所</span>Atelier</a></li>
+  <li><a href="#demarche"><span class="jp">道</span>Démarche</a></li>
+  <li><a href="#contact"><span class="jp">話</span>Contact</a></li>
+</ul>
+
+<!-- ====== HERO ====== -->
+<header class="hero" id="top">
+  <canvas id="cityCanvas"></canvas>
+  <div>
+    <div class="eyebrow reveal"><span class="jp">建築事務所</span> Architecture · Urbanisme · Bruxelles</div>
+    <h1 class="reveal d1">Dessiner la ville<br>comme on trace<br><span class="accent">un plan d'avenir</span>.</h1>
+    <p class="reveal d2">Atelier Yohaku — « l'espace vide » en japonais — conçoit des bâtiments et des quartiers où le plein et le vide dialoguent. Faites défiler : la ville se construit sous vos yeux.</p>
+    <div class="hero-actions reveal d3">
+      <a class="btn" href="#projets">Voir les projets <span class="arrow">→</span></a>
+      <a class="btn ghost" href="#volume">Explorer en 3D</a>
+    </div>
+  </div>
+  <aside class="hero-card reveal d2">
+    <span class="tag">Futur Développement 1</span>
+    <h3>Pôle gare &amp; logements</h3>
+    <div class="meta">Masterplan · 12 ha · En cours</div>
+    <div class="photo" style="height:170px">
+      <img src="https://picsum.photos/seed/yohaku-hero/640/420?grayscale" alt="Photographie architecturale en noir et blanc" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
+      <span class="ph-label">Site · Gare Nord</span>
+    </div>
+  </aside>
+  <div class="scroll-hint"><span class="line"></span> Défiler <span style="color:var(--rouge)">下</span></div>
+</header>
+
+<!-- ====== PROJETS ====== -->
+<section id="projets">
+  <div class="sec-head reveal">
+    <span class="sec-num">N°01</span>
+    <h2>Projets<span class="jp">作品</span></h2>
+  </div>
+  <p class="sec-sub reveal d1">Cliquez sur un projet pour ouvrir sa fiche complète : photographies, maquette 3D interactive et chronologie du chantier.</p>
+
+  <div class="legend reveal d2" role="group" aria-label="Filtrer les projets">
+    <button class="active" data-filter="all" aria-pressed="true"><span class="swatch sw-plein"></span>Tout</button>
+    <button data-filter="logement" aria-pressed="false"><span class="swatch sw-rouge"></span>Logement</button>
+    <button data-filter="public" aria-pressed="false"><span class="swatch sw-dots"></span>Équipement public</button>
+    <button data-filter="urbain" aria-pressed="false"><span class="swatch sw-hatch"></span>Masterplan urbain</button>
+  </div>
+
+  <div class="projects" id="projectGrid"><!-- cartes générées en JS --></div>
+  <div class="empty-msg" id="emptyMsg">+ Aucun projet dans cette catégorie pour l'instant</div>
+</section>
+
+<!-- ====== FICHE PROJET ====== -->
+<div class="pmodal" id="pmodal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <div class="pm-top">
+    <span class="crumb"><span class="jp">作</span> Projets / <span id="pmCrumb">—</span></span>
+    <div class="pm-nav">
+      <button class="pm-btn" id="pmPrev">← Préc.</button>
+      <button class="pm-btn" id="pmNext">Suiv. →</button>
+      <button class="pm-btn close" id="pmClose">Fermer ✕</button>
+    </div>
+  </div>
+  <div class="pm-scroll" id="pmScroll">
+    <div class="pm-hero">
+      <div class="pm-photo" id="pmPhoto">
+        <img id="pmImg" src="" alt="">
+        <span class="ph-label" id="pmImgLabel"></span>
+      </div>
+      <div class="pm-title">
+        <span class="cat" id="pmCat"></span>
+        <h2 id="pmTitle" style="font-family:var(--display);font-weight:800"></h2>
+        <div class="lieu" id="pmLieu"></div>
+      </div>
+    </div>
+    <div class="pm-body">
+      <div class="pm-left">
+        <div class="pm-h">Fiche technique<span class="jp">概要</span></div>
+        <div class="specs" id="pmSpecs"></div>
+        <div class="pm-h">Chronologie<span class="jp">工程</span></div>
+        <div class="tl" id="pmTimeline"></div>
+        <div class="pm-h">Le projet<span class="jp">説明</span></div>
+        <div class="pm-desc" id="pmDesc"></div>
+      </div>
+      <div class="pm-right">
+        <div class="pm-h">Maquette 3D<span class="jp">模型</span></div>
+        <div class="viewer" id="pmViewer">
+          <span class="v-tag">Interactif</span>
+          <canvas id="pmCanvas"></canvas>
+          <span class="v-hint">Glisser pour pivoter</span>
+        </div>
+        <div class="v-controls">
+          <button id="vAuto" class="on">Rotation auto</button>
+          <button id="vReset">Réinitialiser la vue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TOUR 3D ====== -->
+<section class="tour3d" id="volume">
+  <div class="tour-wrap" id="tourWrap">
+    <div class="tour-sticky">
+      <canvas id="towerCanvas"></canvas>
+      <div class="tour-copy">
+        <span class="sec-num">N°02</span>
+        <h2>Tours Komorebi<span class="jp">塔</span></h2>
+        <p>Continuez à défiler : noyau, plateaux, torsion, résille. La tour se construit en fonction de votre descente.</p>
+        <div class="tour-phase"><span class="dot"></span><span id="phaseLabel">Phase 01 — Noyau</span></div>
+      </div>
+      <div class="tour-progress"><div class="bar" id="tourBar"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== ATELIER ====== -->
+<section class="atelier" id="atelier">
+  <div class="sec-head reveal"><span class="sec-num">N°03</span><h2>L'Atelier<span class="jp">事務所</span></h2></div>
+  <p class="sec-sub reveal d1">Fondé à Bruxelles, l'atelier réunit architectes et urbanistes autour d'une conviction : le vide structure autant que le bâti.</p>
+  <div class="atelier-grid reveal d2">
+    <div class="stat"><div class="num" data-count="48">0</div><div class="lab">Projets livrés</div></div>
+    <div class="stat"><div class="num" data-count="12">0</div><div class="lab">Masterplans</div></div>
+    <div class="stat"><div class="num" data-count="9">0</div><div class="lab">Prix &amp; distinctions</div></div>
+    <div class="stat"><div class="num" data-count="14">0</div><div class="lab">Collaborateurs</div></div>
+  </div>
+</section>
+
+<!-- ====== DÉMARCHE ====== -->
+<section id="demarche">
+  <div class="sec-head reveal"><span class="sec-num">N°04</span><h2>Démarche<span class="jp">道</span></h2></div>
+  <p class="sec-sub reveal d1">Notre méthode suit la voie du plan : lire, tracer, construire, transmettre.</p>
+  <div class="steps">
+    <div class="step reveal"><h3>Lire le territoire<span class="jp">読む</span></h3><p>Avant le premier trait : arpenter, cartographier, écouter. Le site dicte plus que le programme.</p></div>
+    <div class="step reveal"><h3>Tracer le vide<span class="jp">描く</span></h3><p>Nous dessinons d'abord les espaces libres — rues, cours, jardins — puis le bâti vient les tenir.</p></div>
+    <div class="step reveal"><h3>Construire juste<span class="jp">建てる</span></h3><p>Matériaux locaux, structures lisibles, détails durables. Rien de superflu, rien de manquant.</p></div>
+    <div class="step reveal"><h3>Transmettre<span class="jp">伝える</span></h3><p>Un quartier réussi continue d'évoluer sans nous. Nous livrons des plans ouverts, pas des objets finis.</p></div>
+  </div>
+</section>
+
+<!-- ====== CONTACT ====== -->
+<section id="contact">
+  <div class="sec-head reveal"><span class="sec-num">N°05</span><h2>Contact<span class="jp">連絡</span></h2></div>
+  <p class="sec-sub reveal d1">Un terrain, une idée, un quartier à réinventer ? Parlons-en.</p>
+  <div class="contact-wrap">
+    <div class="contact-card reveal d1">
+      <div class="field" id="fNom"><label for="nom">Nom</label><input id="nom" type="text" placeholder="Votre nom"><span class="err">Indiquez votre nom</span></div>
+      <div class="field" id="fEmail"><label for="email">E-mail</label><input id="email" type="email" placeholder="vous@exemple.be"><span class="err">E-mail invalide</span></div>
+      <div class="field" id="fMsg"><label for="msg">Votre projet</label><textarea id="msg" rows="4" placeholder="Décrivez le site, le programme, vos envies…"></textarea><span class="err">Dites-nous en un peu plus</span></div>
+      <button class="btn" id="sendBtn" type="button">Envoyer le message →</button>
+      <div class="toast" id="toast">+ Message envoyé. Nous revenons vers vous sous 48 h.</div>
+    </div>
+    <div class="contact-info reveal d2">
+      <p>L'atelier reçoit sur rendez-vous, dans un ancien entrepôt face au canal. Les maquettes sont sur la table, le café est chaud.</p>
+      <div class="coord"><span class="plus">+</span>Quai des Charbonnages 12, 1080 Bruxelles</div>
+      <div class="coord"><span class="plus">+</span>bonjour@atelier-yohaku.be</div>
+      <div class="coord"><span class="plus">+</span>+32 2 000 00 00</div>
+      <div class="photo" style="height:200px;margin-top:26px">
+        <img src="https://picsum.photos/seed/yohaku-atelier/720/420?grayscale" alt="L'atelier face au canal" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
+        <span class="ph-label">L'atelier · Molenbeek</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Atelier Yohaku <span class="jp">余白</span></span>
+  <span>Architecture · Urbanisme · <span class="jp">建築</span></span>
+  <span>Bruxelles, Belgique</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const INK=0x0E0E0E, ROUGE=0x7A0E14, ROUGE_VIF=0x9E1620;
+
+/* ============================================================
+   DONNÉES PROJETS
+   ============================================================ */
+const PROJECTS = [
+ {id:'gare-nord', cat:'urbain', catLabel:'Masterplan', title:'Quartier de la Gare Nord', lieu:'Bruxelles, Belgique', annee:'2025', seed:'yohaku-urb1', model:'masterplan',
+  specs:{'Surface':'12 ha','Programme':'Mixte gare + logements','Maîtrise d\u2019ouvrage':'Région BXL','Statut':'En cours','Budget':'84 M€','Livraison':'2029'},
+  timeline:[{d:'2023 T2',l:'Concours remporté',s:'done'},{d:'2024 T1',l:'Masterplan approuvé',s:'done'},{d:'2025 T3',l:'Permis — phase 1',s:'now'},{d:'2027',l:'Chantier infrastructures',s:''},{d:'2029',l:'Livraison phase 1',s:''}],
+  desc:['Reconnexion d\u2019un pôle ferroviaire au centre-ville : la voie, longtemps coupure, devient colonne vertébrale. Logements, programmes universitaires et musée s\u2019accrochent à une promenade plantée continue.','Le plan laisse un tiers du site non bâti — places, vergers, zones humides — selon le principe du yohaku : c\u2019est le vide qui donne sa valeur au plein.']},
+ {id:'verger', cat:'logement', catLabel:'Logement', title:'Maisons du Verger', lieu:'Namur, Belgique', annee:'2024', seed:'yohaku-log1', model:'houses',
+  specs:{'Surface':'4 800 m²','Programme':'32 logements','Maîtrise d\u2019ouvrage':'Coopérative','Statut':'Livré','Budget':'9,6 M€','Certification':'Passif'},
+  timeline:[{d:'2021',l:'Esquisse & ateliers habitants',s:'done'},{d:'2022 T2',l:'Permis obtenu',s:'done'},{d:'2023',l:'Chantier bois',s:'done'},{d:'2024 T3',l:'Livraison & plantation du verger',s:'done'}],
+  desc:['Trente-deux logements en bande autour d\u2019un verger partagé. Structure bois locale, toitures à pente japonaise, seuils généreux : l\u2019engawa belge.','Chaque maison possède deux façades de vie — côté rue, côté verger — et aucune clôture : les limites sont dessinées par les arbres.']},
+ {id:'engawa', cat:'public', catLabel:'Équipement', title:'Médiathèque Engawa', lieu:'Gand, Belgique', annee:'2024', seed:'yohaku-pub1', model:'pavilion',
+  specs:{'Surface':'3 200 m²','Programme':'Médiathèque + café','Maîtrise d\u2019ouvrage':'Ville de Gand','Statut':'Livré','Budget':'11,2 M€','Prix':'Prix Belge d\u2019Arch. 2025'},
+  timeline:[{d:'2020',l:'Concours remporté',s:'done'},{d:'2021',l:'Études & permis',s:'done'},{d:'2022-23',l:'Chantier',s:'done'},{d:'2024 T1',l:'Ouverture au public',s:'done'}],
+  desc:['Une véranda habitée entre le parc et la rue : la limite devient un lieu, comme l\u2019engawa des maisons japonaises.','Un grand toit plat porté par une forêt de colonnes fines abrite des salles de lecture qui s\u2019ouvrent entièrement sur le parc en été.']},
+ {id:'croisement', cat:'urbain', catLabel:'Masterplan', title:'Croisement à niveau — Révision', lieu:'Louvain, Belgique', annee:'2023', seed:'yohaku-urb2', model:'intersection',
+  specs:{'Surface':'2,1 ha','Programme':'Espace public','Maîtrise d\u2019ouvrage':'Ville de Louvain','Statut':'Livré','Budget':'4,3 M€','Trafic apaisé':'-46 %'},
+  timeline:[{d:'2021',l:'Étude de mobilité',s:'done'},{d:'2022 T1',l:'Concertation citoyenne',s:'done'},{d:'2022 T4',l:'Chantier en site occupé',s:'done'},{d:'2023 T2',l:'Inauguration de la place',s:'done'}],
+  desc:['Pacification d\u2019une intersection routière : la voiture cède la priorité, le piéton retrouve la diagonale.','Le carrefour devient une place traversante : un sol unique, des croix peintes au sol comme sur nos plans, et quatre bâtiments d\u2019angle qui tiennent l\u2019espace.']},
+ {id:'komorebi', cat:'logement', catLabel:'Logement', title:'Tours Komorebi', lieu:'Anvers, Belgique', annee:'2023', seed:'yohaku-log2', model:'tower',
+  specs:{'Hauteur':'72 m · 22 étages','Programme':'140 logements','Maîtrise d\u2019ouvrage':'Privé + AIS','Statut':'Livré','Budget':'38 M€','Structure':'Noyau béton + bois'},
+  timeline:[{d:'2019',l:'Concours remporté',s:'done'},{d:'2020',l:'Permis & études',s:'done'},{d:'2021-22',l:'Chantier',s:'done'},{d:'2023 T4',l:'Livraison',s:'done'}],
+  desc:['Deux tours décalées qui filtrent la lumière comme les feuillages — komorebi, la lumière qui passe entre les arbres.','Les plateaux pivotent légèrement à chaque niveau : chaque logement gagne une orientation propre, et la façade devient une résille vivante. La grande maquette de la section « Volume » montre ce principe en mouvement.']},
+ {id:'tarn', cat:'public', catLabel:'Équipement', title:'Pavillon du Musée Tarn', lieu:'Bruxelles, Belgique', annee:'2022', seed:'yohaku-pub2', model:'origami',
+  specs:{'Surface':'860 m²','Programme':'Extension muséale','Maîtrise d\u2019ouvrage':'Fondation Tarn','Statut':'Livré','Budget':'3,1 M€','Structure':'Charpente CLT'},
+  timeline:[{d:'2020',l:'Commande directe',s:'done'},{d:'2021 T1',l:'Permis patrimoine',s:'done'},{d:'2021-22',l:'Préfabrication & montage',s:'done'},{d:'2022 T3',l:'Ouverture',s:'done'}],
+  desc:['Extension muséale en charpente apparente : un origami de bois posé dans la cour historique.','Le volume plié ne touche les façades classées en aucun point ; il repose sur un socle de pierre bleue et se lit comme une maquette à l\u2019échelle 1.']}
+];
+
+/* ============================================================
+   GÉNÉRATION DES CARTES
+   ============================================================ */
+const grid=document.getElementById('projectGrid');
+PROJECTS.forEach((p,i)=>{
+  const a=document.createElement('article');
+  a.className='project reveal'+(i%3===1?' d1':i%3===2?' d2':'');
+  a.dataset.cat=p.cat; a.dataset.id=p.id; a.tabIndex=0;
+  a.setAttribute('role','button'); a.setAttribute('aria-label','Ouvrir la fiche : '+p.title);
+  a.innerHTML=`
+    <div class="thumb">
+      <img src="https://picsum.photos/seed/${p.seed}/660/440?grayscale" alt="${p.title}" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
+      <span class="open-hint">+ Ouvrir la fiche</span>
+    </div>
+    <div class="body">
+      <span class="cat">${p.catLabel}</span>
+      <h3>${p.title}</h3>
+      <p class="desc">${p.desc[0]}</p>
+      <div class="foot"><span>${p.lieu.split(',')[0]} · ${p.annee}</span><span class="arrow">→</span></div>
+    </div>`;
+  a.addEventListener('click',()=>openProject(p.id));
+  a.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openProject(p.id);}});
+  grid.appendChild(a);
+});
+
+/* ============================================================
+   FICHE PROJET + VISIONNEUSE 3D
+   ============================================================ */
+const pmodal=document.getElementById('pmodal');
+let currentIdx=-1;
+
+const viewer=(function(){
+  const canvas=document.getElementById('pmCanvas');
+  const box=document.getElementById('pmViewer');
+  if(!window.THREE) return null;
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(38,1,.1,300);
+  let model=null, rotY=.6, rotX=.35, targetRotY=.6, targetRotX=.35, dist=26, auto=true, raf=null, dragging=false, lx=0, ly=0;
+
+  const inkLine=()=>new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.85});
+  const redLine=()=>new THREE.LineBasicMaterial({color:ROUGE_VIF});
+  const redMesh=()=>new THREE.MeshBasicMaterial({color:ROUGE});
+  function edges(geo,mat){return new THREE.LineSegments(new THREE.EdgesGeometry(geo),mat)}
+  function block(w,h,d,x,z,red){
+    const g=new THREE.Group();
+    const geo=new THREE.BoxGeometry(w,h,d); geo.translate(0,h/2,0);
+    if(red) g.add(new THREE.Mesh(geo,redMesh()));
+    g.add(edges(geo,red?redLine():inkLine()));
+    g.position.set(x,0,z); return g;
+  }
+  function ground(g,r){
+    const pts=[]; const n=14;
+    for(let x=-n;x<=n;x+=2){for(let z=-n;z<=n;z+=2){const s=.16;pts.push(x-s,0,z,x+s,0,z,x,0,z-s,x,0,z+s);}}
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+    g.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.25})));
+  }
+
+  const builders={
+    masterplan(g){
+      ground(g);
+      // voie ferrée rouge en diagonale
+      const rail=new THREE.Mesh(new THREE.BoxGeometry(.7,.1,34),redMesh());
+      rail.rotation.y=.4; g.add(rail);
+      for(let i=0;i<26;i++){
+        const x=(Math.random()-.5)*22, z=(Math.random()-.5)*22;
+        if(Math.abs(x*Math.cos(.4)+z*Math.sin(.4))<2) continue;
+        g.add(block(1.4+Math.random()*1.4,.6+Math.random()*4.4,1.4+Math.random()*1.4,x,z,Math.random()<.12));
+      }
+      dist=30;
+    },
+    houses(g){
+      ground(g);
+      for(let r=0;r<3;r++){
+        for(let i=0;i<6;i++){
+          const x=-9+i*3.6, z=-6+r*6;
+          const h=2+Math.random()*.5;
+          const base=block(2.4,h,2.8,x,z,false);
+          const roofGeo=new THREE.ConeGeometry(1.9,1.4,4);
+          roofGeo.rotateY(Math.PI/4); roofGeo.translate(0,h+.7,0);
+          base.add(edges(roofGeo,(r===1&&i===2)?redLine():inkLine()));
+          if(r===1&&i===2) base.add(new THREE.Mesh(roofGeo,redMesh()));
+          g.add(base);
+        }
+      }
+      // rangée d'arbres (le verger)
+      for(let i=0;i<7;i++){
+        const t=new THREE.Group();
+        const trunk=new THREE.BoxGeometry(.12,1,.12); trunk.translate(0,.5,0);
+        const crown=new THREE.SphereGeometry(.7,6,5); crown.translate(0,1.5,0);
+        t.add(edges(trunk,inkLine())); t.add(edges(crown,inkLine()));
+        t.position.set(-9+i*3,0,0); g.add(t);
+      }
+      dist=24;
+    },
+    pavilion(g){
+      ground(g);
+      const roof=new THREE.BoxGeometry(16,.5,11); roof.translate(0,4.4,0);
+      g.add(edges(roof,inkLine()));
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(16,.5,11).translate(0,4.4,0),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.85})));
+      for(let x=-3;x<=3;x++){for(let z=-2;z<=2;z+=4){
+        const col=new THREE.BoxGeometry(.16,4.2,.16); col.translate(x*2.2,2.1,z*1.9);
+        g.add(edges(col,inkLine()));
+      }}
+      const inner=new THREE.BoxGeometry(9,3,6); inner.translate(0,1.5,0);
+      g.add(edges(inner,redLine()));
+      dist=22;
+    },
+    intersection(g){
+      ground(g);
+      const roadMat=new THREE.MeshBasicMaterial({color:INK});
+      const r1=new THREE.Mesh(new THREE.BoxGeometry(30,.08,2.6),roadMat); g.add(r1);
+      const r2=new THREE.Mesh(new THREE.BoxGeometry(2.6,.08,30),roadMat); g.add(r2);
+      const plaza=new THREE.RingGeometry(3.4,3.7,40); plaza.rotateX(-Math.PI/2); plaza.translate(0,.06,0);
+      g.add(new THREE.Mesh(plaza,redMesh()));
+      [[6,6],[-6,6],[6,-6],[-6,-6]].forEach(([x,z],i)=>{
+        g.add(block(3.4,2.6+i*1.1,3.4,x,z,i===2));
+      });
+      dist=26;
+    },
+    tower(g){
+      ground(g);
+      const FL=22;
+      const core=new THREE.CylinderGeometry(.9,.9,FL*.62,10); core.translate(0,FL*.31,0);
+      g.add(new THREE.Mesh(core,redMesh()));
+      for(let i=0;i<FL;i++){
+        const geo=new THREE.BoxGeometry(4.6,.4,4.6);
+        const s=new THREE.Group();
+        s.add(edges(geo,(i%6===0)?redLine():inkLine()));
+        s.position.y=i*.62+.3; s.rotation.y=i*.12;
+        g.add(s);
+      }
+      dist=24;
+    },
+    origami(g){
+      ground(g);
+      const plinth=new THREE.BoxGeometry(8,.8,8); plinth.translate(0,.4,0);
+      g.add(edges(plinth,inkLine()));
+      const ico=new THREE.IcosahedronGeometry(3.1,0); ico.translate(0,4,0);
+      g.add(new THREE.Mesh(ico,new THREE.MeshBasicMaterial({color:0xffffff})));
+      g.add(edges(ico,redLine()));
+      const door=new THREE.BoxGeometry(1.4,2.2,.15); door.translate(0,1.9,4.05);
+      g.add(edges(door,inkLine()));
+      dist=20;
+    }
+  };
+
+  function resize(){
+    const w=box.clientWidth,h=box.clientHeight;
+    renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize',()=>{if(pmodal.classList.contains('open'))resize();});
+
+  function frame(){
+    if(auto && !dragging && !reduceMotion) targetRotY+=.004;
+    rotY+=(targetRotY-rotY)*.08; rotX+=(targetRotX-rotX)*.08;
+    rotX=Math.max(.08,Math.min(1.25,rotX));
+    camera.position.set(Math.sin(rotY)*Math.cos(rotX)*dist, Math.sin(rotX)*dist, Math.cos(rotY)*Math.cos(rotX)*dist);
+    camera.lookAt(0,2.4,0);
+    renderer.render(scene,camera);
+    raf=requestAnimationFrame(frame);
+  }
+
+  box.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;box.setPointerCapture(e.pointerId);});
+  box.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    targetRotY+=(e.clientX-lx)*.008; targetRotX+=(e.clientY-ly)*.006;
+    targetRotX=Math.max(.08,Math.min(1.25,targetRotX));
+    lx=e.clientX;ly=e.clientY;
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>box.addEventListener(ev,()=>dragging=false));
+
+  document.getElementById('vAuto').addEventListener('click',function(){auto=!auto;this.classList.toggle('on',auto);});
+  document.getElementById('vReset').addEventListener('click',()=>{targetRotY=.6;targetRotX=.35;});
+
+  return {
+    show(type){
+      if(model){scene.remove(model);model.traverse(o=>{o.geometry&&o.geometry.dispose();o.material&&o.material.dispose&&o.material.dispose();});}
+      model=new THREE.Group();
+      (builders[type]||builders.tower)(model);
+      scene.add(model);
+      targetRotY=.6;targetRotX=.35;rotY=.6;rotX=.35;
+      resize();
+      if(!raf) frame();
+    },
+    stop(){if(raf){cancelAnimationFrame(raf);raf=null;}}
+  };
+})();
+
+function openProject(id){
+  const idx=PROJECTS.findIndex(p=>p.id===id);
+  if(idx<0)return;
+  currentIdx=idx;
+  const p=PROJECTS[idx];
+  document.getElementById('pmCrumb').textContent=p.title;
+  document.getElementById('pmCat').textContent=p.catLabel;
+  document.getElementById('pmTitle').textContent=p.title;
+  document.getElementById('pmLieu').textContent=p.lieu+' · '+p.annee;
+  const photo=document.getElementById('pmPhoto');
+  photo.classList.remove('fallback');
+  let img=document.getElementById('pmImg');
+  if(!img){img=document.createElement('img');img.id='pmImg';photo.prepend(img);}
+  img.src=`https://picsum.photos/seed/${p.seed}-large/1100/740?grayscale`;
+  img.alt=p.title;
+  img.onerror=()=>{photo.classList.add('fallback');img.remove();};
+  document.getElementById('pmImgLabel').textContent=p.title+' · '+p.lieu.split(',')[0];
+  // specs
+  document.getElementById('pmSpecs').innerHTML=Object.entries(p.specs).map(([k,v])=>`<div class="spec"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  // timeline
+  document.getElementById('pmTimeline').innerHTML=p.timeline.map(t=>`<div class="tl-item ${t.s}"><div class="d">${t.d}</div><div class="l">${t.l}</div></div>`).join('');
+  // description
+  document.getElementById('pmDesc').innerHTML=p.desc.map(d=>`<p>${d}</p>`).join('');
+  // 3D
+  pmodal.classList.add('open');
+  document.body.classList.add('modal-open');
+  document.getElementById('pmScroll').scrollTop=0;
+  requestAnimationFrame(()=>{
+    pmodal.classList.add('visible');
+    viewer&&viewer.show(p.model);
+  });
+}
+function closeProject(){
+  pmodal.classList.remove('visible');
+  document.body.classList.remove('modal-open');
+  viewer&&viewer.stop();
+  setTimeout(()=>pmodal.classList.remove('open'),350);
+}
+document.getElementById('pmClose').addEventListener('click',closeProject);
+document.getElementById('pmPrev').addEventListener('click',()=>openProject(PROJECTS[(currentIdx-1+PROJECTS.length)%PROJECTS.length].id));
+document.getElementById('pmNext').addEventListener('click',()=>openProject(PROJECTS[(currentIdx+1)%PROJECTS.length].id));
+document.addEventListener('keydown',e=>{
+  if(!pmodal.classList.contains('open'))return;
+  if(e.key==='Escape')closeProject();
+  if(e.key==='ArrowLeft')document.getElementById('pmPrev').click();
+  if(e.key==='ArrowRight')document.getElementById('pmNext').click();
+});
+
+/* ============================================================
+   SCÈNE 1 — VILLE FILAIRE (hero)
+   ============================================================ */
+(function(){
+  const canvas=document.getElementById('cityCanvas');
+  if(!canvas||!window.THREE)return;
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(40,1,.1,200);
+  const lineMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.85});
+  const redMat=new THREE.MeshBasicMaterial({color:ROUGE});
+  const buildings=[]; const N=11,SP=2.2;
+  for(let x=0;x<N;x++)for(let z=0;z<N;z++){
+    if(Math.random()<.22)continue;
+    const h=.6+Math.pow(Math.random(),2.2)*7;
+    const geo=new THREE.BoxGeometry(1.25,h,1.25); geo.translate(0,h/2,0);
+    const group=new THREE.Group();
+    if(Math.random()<.1)group.add(new THREE.Mesh(geo,redMat));
+    group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),lineMat));
+    group.position.set((x-(N-1)/2)*SP,0,(z-(N-1)/2)*SP);
+    group.scale.y=.001; group.userData.delay=(x+z)*55+Math.random()*250;
+    scene.add(group); buildings.push(group);
+  }
+  const pts=[];
+  for(let x=0;x<=N;x++)for(let z=0;z<=N;z++){
+    const cx=(x-N/2)*SP,cz=(z-N/2)*SP,s=.18;
+    pts.push(cx-s,0,cz,cx+s,0,cz,cx,0,cz-s,cx,0,cz+s);
+  }
+  const crossGeo=new THREE.BufferGeometry();
+  crossGeo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+  scene.add(new THREE.LineSegments(crossGeo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.3})));
+  let mouseX=0;
+  window.addEventListener('mousemove',e=>{mouseX=(e.clientX/window.innerWidth-.5);},{passive:true});
+  const t0=performance.now();
+  function resize(){
+    const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight;
+    renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize',resize);resize();
+  function frame(t){
+    const el=t-t0;
+    buildings.forEach(b=>{
+      const k=Math.max(0,Math.min(1,(el-b.userData.delay)/900));
+      b.scale.y=.001+(1-Math.pow(1-k,3))*.999;
+    });
+    const heroH=document.querySelector('.hero').offsetHeight;
+    const p=Math.min(1,window.scrollY/(heroH*1.1));
+    const angle=-.6+p*1.5+(reduceMotion?0:mouseX*.25);
+    const radius=26-p*7, height=12+p*14;
+    camera.position.set(Math.sin(angle)*radius,height,Math.cos(angle)*radius);
+    camera.lookAt(0,2.2,0);
+    renderer.render(scene,camera);
+    if(!reduceMotion)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ============================================================
+   SCÈNE 2 — TOUR KOMOREBI AMÉLIORÉE
+   (noyau rouge, arêtes torsadées continues, résille, brume)
+   ============================================================ */
+(function(){
+  const canvas=document.getElementById('towerCanvas');
+  const wrap=document.getElementById('tourWrap');
+  if(!canvas||!wrap||!window.THREE)return;
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.Fog(0x0E0E0E,28,72); // brume de profondeur
+  const camera=new THREE.PerspectiveCamera(38,1,.1,200);
+
+  const whiteLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.9});
+  const greyLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.32});
+  const redLine=new THREE.LineBasicMaterial({color:ROUGE_VIF});
+  const redMesh=new THREE.MeshBasicMaterial({color:ROUGE,transparent:true,opacity:.95});
+
+  const FLOORS=40, FH=.55, HALF=3;
+  const slabs=[];
+  const slabGeoA=new THREE.BoxGeometry(HALF*2,FH*.78,HALF*2);
+  const slabGeoB=new THREE.BoxGeometry(HALF*1.74,FH*.78,HALF*1.74);
+  for(let i=0;i<FLOORS;i++){
+    const g=new THREE.Group();
+    const isRed=(i%8===0);
+    const geo=(i%2===0)?slabGeoA:slabGeoB;
+    if(isRed)g.add(new THREE.Mesh(geo,redMesh));
+    g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),isRed?redLine:whiteLine));
+    g.position.y=i*FH; scene.add(g); slabs.push(g);
+  }
+
+  // NOYAU central rouge
+  const coreGeo=new THREE.CylinderGeometry(1.05,1.05,FLOORS*FH,12,1,true);
+  coreGeo.translate(0,FLOORS*FH/2,0);
+  const core=new THREE.Mesh(coreGeo,new THREE.MeshBasicMaterial({color:ROUGE,transparent:true,opacity:.9,side:THREE.DoubleSide}));
+  const coreEdges=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(1.05,1.05,FLOORS*FH,12).translate(0,FLOORS*FH/2,0)),redLine);
+  scene.add(core); scene.add(coreEdges);
+
+  // ARÊTES VERTICALES CONTINUES (résille torsadée, recalculée chaque image)
+  const segs=(FLOORS-1)*4;
+  const edgePos=new Float32Array(segs*2*3);
+  const edgeGeo=new THREE.BufferGeometry();
+  edgeGeo.setAttribute('position',new THREE.BufferAttribute(edgePos,3));
+  const edgeLines=new THREE.LineSegments(edgeGeo,greyLine);
+  scene.add(edgeLines);
+  const corners=[[HALF,HALF],[HALF,-HALF],[-HALF,-HALF],[-HALF,HALF]];
+  const tmp=new THREE.Vector3();
+
+  // sol pointillé + anneau de chantier
+  const gpts=[];
+  for(let i=0;i<260;i++){
+    const a=Math.random()*Math.PI*2,r=6+Math.random()*16;
+    gpts.push(Math.cos(a)*r,0,Math.sin(a)*r,Math.cos(a)*r,.06,Math.sin(a)*r);
+  }
+  const gGeo=new THREE.BufferGeometry();
+  gGeo.setAttribute('position',new THREE.Float32BufferAttribute(gpts,3));
+  scene.add(new THREE.LineSegments(gGeo,new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.3})));
+  const ringGeo=new THREE.RingGeometry(7.6,7.75,48,1,0,Math.PI*1.6);
+  ringGeo.rotateX(-Math.PI/2); ringGeo.translate(0,.04,0);
+  const ring=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:ROUGE_VIF,side:THREE.DoubleSide}));
+  scene.add(ring);
+
+  const phaseLabel=document.getElementById('phaseLabel');
+  const tourBar=document.getElementById('tourBar');
+  const phases=['Phase 01 — Noyau 核','Phase 02 — Plateaux','Phase 03 — Torsion 捻り','Phase 04 — Komorebi 木漏れ日'];
+  let lastPhase=-1, smoothP=0;
+
+  function resize(){
+    const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight;
+    renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize',resize);resize();
+
+  function frame(){
+    const rect=wrap.getBoundingClientRect();
+    const total=rect.height-window.innerHeight;
+    const raw=Math.max(0,Math.min(1,-rect.top/total));
+    smoothP+=(raw-smoothP)*.09; // lissage du scroll
+    const p=smoothP;
+
+    const coreRise=Math.min(1,p/.22);
+    const rise=Math.max(0,Math.min(1,(p-.12)/.4));
+    const twist=Math.max(0,(p-.42)/.58)*.16;
+    const breathe=Math.max(0,(p-.6)/.4);
+
+    core.scale.y=Math.max(.001,coreRise); coreEdges.scale.y=core.scale.y;
+
+    slabs.forEach((s,i)=>{
+      const k=Math.max(0,Math.min(1,rise*FLOORS-i));
+      const e=1-Math.pow(1-k,3);
+      s.position.y=i*FH*e;
+      const taper=1-(i/FLOORS)*.14; // léger fuselage
+      s.scale.set((.25+.75*e)*taper,1,(.25+.75*e)*taper);
+      s.rotation.y=i*twist+(reduceMotion?0:Math.sin(performance.now()/1600+i*.3)*breathe*.05);
+      s.position.x=breathe*Math.sin(i*.7)*.5;
+      s.visible=e>.02;
+    });
+
+    // mise à jour de la résille torsadée
+    let w=0;
+    for(let i=0;i<FLOORS-1;i++){
+      for(let c=0;c<4;c++){
+        const a=slabs[i],b=slabs[i+1];
+        tmp.set(corners[c][0],0,corners[c][1]).applyEuler(a.rotation).multiply(a.scale).add(a.position);
+        edgePos[w++]=tmp.x;edgePos[w++]=tmp.y;edgePos[w++]=tmp.z;
+        tmp.set(corners[c][0],0,corners[c][1]).applyEuler(b.rotation).multiply(b.scale).add(b.position);
+        edgePos[w++]=tmp.x;edgePos[w++]=tmp.y;edgePos[w++]=tmp.z;
+      }
+    }
+    edgeGeo.attributes.position.needsUpdate=true;
+    edgeLines.visible=p>.18;
+    greyLine.opacity=.1+Math.min(.45,p*.6);
+
+    ring.rotation.y=performance.now()/4000;
+
+    const angle=.6+p*2.4, camH=4+p*16, radius=27-p*7;
+    camera.position.set(Math.sin(angle)*radius,camH,Math.cos(angle)*radius);
+    camera.lookAt(0,Math.max(2,(FLOORS*FH*rise)/2),0);
+    renderer.render(scene,camera);
+
+    const ph=Math.min(3,Math.floor(raw*4));
+    if(ph!==lastPhase){phaseLabel.textContent=phases[ph];lastPhase=ph;}
+    tourBar.style.width=(raw*100)+'%';
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ====== Rail ====== */
+const railFill=document.getElementById('railFill');
+const railMarker=document.getElementById('railMarker');
+function updateRail(){
+  const h=document.documentElement;
+  const p=h.scrollTop/(h.scrollHeight-h.clientHeight);
+  const pct=Math.min(100,Math.max(0,p*100));
+  railFill.style.height=pct+'%';railMarker.style.top=pct+'%';
+}
+window.addEventListener('scroll',updateRail,{passive:true});updateRail();
+
+/* ====== Révélation ====== */
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ====== Compteurs ====== */
+const cio=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(!e.isIntersecting)return;
+    const el=e.target,target=+el.dataset.count,dur=1200,t0=performance.now();
+    (function tick(t){const k=Math.min(1,(t-t0)/dur);el.textContent=Math.round(target*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(tick);})(t0);
+    cio.unobserve(el);
+  });
+},{threshold:.4});
+document.querySelectorAll('.num[data-count]').forEach(c=>cio.observe(c));
+
+/* ====== Filtres ====== */
+const legendBtns=document.querySelectorAll('.legend button');
+const emptyMsg=document.getElementById('emptyMsg');
+legendBtns.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    legendBtns.forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false')});
+    btn.classList.add('active');btn.setAttribute('aria-pressed','true');
+    const f=btn.dataset.filter;let visible=0;
+    document.querySelectorAll('.project').forEach(p=>{
+      const show=f==='all'||p.dataset.cat===f;
+      p.classList.toggle('filtered-out',!show);
+      if(show){
+        visible++;
+        p.style.animation='none';void p.offsetWidth;
+        p.style.animation='cardIn .5s cubic-bezier(.2,.7,.2,1) backwards';
+        p.style.animationDelay=(visible*0.07)+'s';
+      }
+    });
+    emptyMsg.classList.toggle('show',visible===0);
+  });
+});
+
+/* ====== Menu mobile ====== */
+const burger=document.getElementById('burger');
+const mobileMenu=document.getElementById('mobileMenu');
+burger.addEventListener('click',()=>{
+  const open=burger.classList.toggle('open');
+  mobileMenu.classList.toggle('open',open);
+  burger.setAttribute('aria-expanded',open);
+});
+mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
+  burger.classList.remove('open');mobileMenu.classList.remove('open');burger.setAttribute('aria-expanded','false');
+}));
+
+/* ====== Lien actif ====== */
+const navAnchors=document.querySelectorAll('.nav-links a');
+const secIO=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting){navAnchors.forEach(a=>a.classList.toggle('current',a.getAttribute('href')==='#'+e.target.id));}});
+},{rootMargin:'-40% 0px -55% 0px'});
+['projets','volume','atelier','demarche','contact'].forEach(id=>{const el=document.getElementById(id);if(el)secIO.observe(el);});
+
+/* ====== Formulaire ====== */
+document.getElementById('sendBtn').addEventListener('click',()=>{
+  const nom=document.getElementById('nom'),email=document.getElementById('email'),msg=document.getElementById('msg');
+  let ok=true;
+  const check=(field,wrap,test)=>{const bad=!test(field.value.trim());document.getElementById(wrap).classList.toggle('error',bad);if(bad)ok=false;};
+  check(nom,'fNom',v=>v.length>1);
+  check(email,'fEmail',v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v));
+  check(msg,'fMsg',v=>v.length>5);
+  if(!ok)return;
+  const toast=document.getElementById('toast');
+  toast.classList.add('show');nom.value=email.value=msg.value='';
+  setTimeout(()=>toast.classList.remove('show'),4000);
+});
+</script>
+</body>
+</html>
