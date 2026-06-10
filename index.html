@@ -52,9 +52,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:
 .mobile-menu a .jp{color:var(--rouge);margin-right:10px}
 
 /* ====== HERO ====== */
-.hero{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;padding:130px 110px 70px 48px;position:relative;overflow:hidden}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 90px;position:relative;overflow:hidden}
 #cityCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
-.hero > div, .hero > aside{position:relative;z-index:2}
+/* voile dégradé : éclaircit le haut (sous la nav) et le centre derrière le texte, laisse la skyline émerger en bas */
+.hero-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:
+  radial-gradient(120% 75% at 50% 42%, rgba(255,255,255,.92) 0%, rgba(255,255,255,.72) 34%, rgba(255,255,255,0) 66%),
+  linear-gradient(to bottom, rgba(255,255,255,.96) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0) 78%, rgba(255,255,255,.55) 100%)}
+.hero-center{position:relative;z-index:2;max-width:880px;display:flex;flex-direction:column;align-items:center}
 .eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;display:flex;align-items:center;gap:14px;margin-bottom:26px}
 .eyebrow::before{content:'';width:48px;height:2px;background:var(--rouge)}
 .eyebrow .jp{color:var(--rouge);letter-spacing:.1em}
@@ -62,7 +66,9 @@ h1{font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,5.6vw,4.9re
 h1 .accent{position:relative;white-space:nowrap;color:var(--paper)}
 h1 .accent::after{content:'';position:absolute;left:-3px;right:-3px;top:.14em;bottom:.14em;background:var(--ink);z-index:-1;transform-origin:left;animation:paint 1s .5s cubic-bezier(.7,0,.2,1) backwards}
 @keyframes paint{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-.hero p{margin-top:28px;max-width:44ch;font-size:1.02rem;color:#333;background:rgba(255,255,255,.7);backdrop-filter:blur(2px)}
+.hero p{margin-top:26px;max-width:46ch;font-size:1.06rem;color:#333}
+.hero p .jp{color:var(--rouge);font-family:var(--display);font-weight:700;margin:0 .15em}
+.hero-actions{justify-content:center}
 .hero-actions{margin-top:40px;display:flex;gap:18px;flex-wrap:wrap}
 .btn{font-family:var(--body);font-size:.74rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:16px 30px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:transform .25s, box-shadow .25s, background .25s, color .25s}
 .btn:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--rouge)}
@@ -302,21 +308,16 @@ footer .jp{color:var(--rouge)}
 <!-- ====== HERO ====== -->
 <header class="hero" id="top">
   <canvas id="cityCanvas"></canvas>
-  <div>
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="hero-center">
     <div class="eyebrow reveal"><span class="jp">建築事務所</span> Architecture · Urbanisme · Bruxelles</div>
-    <h1 class="reveal d1">Dessiner la ville<br>comme on trace<br><span class="accent">un plan d'avenir</span>.</h1>
-    <p class="reveal d2">L'atelier du « vide », où le plein et le vide dialoguent. Faites défiler : la ville se construit sous vos yeux.</p>
+    <h1 class="reveal d1">Dessiner la ville<br>comme on trace <span class="accent">un plan d'avenir</span>.</h1>
+    <p class="reveal d2">L'atelier du vide <span class="jp">余白</span> — le plein et le vide en dialogue.</p>
     <div class="hero-actions reveal d3">
       <a class="btn" href="#projets">Voir les projets <span class="arrow">→</span></a>
       <a class="btn ghost" href="#volume">Explorer en 3D</a>
     </div>
   </div>
-  <aside class="hero-card reveal d2">
-    <span class="tag">余白</span>
-    <h3>Yohaku</h3>
-    <div class="meta">L'espace vide</div>
-    <p style="font-size:.86rem;color:#444;margin-top:12px">Ce qui n'est pas bâti compte autant que ce qui l'est.</p>
-  </aside>
   <div class="scroll-hint"><span class="line"></span> Défiler <span style="color:var(--rouge)">下</span></div>
 </header>
 
@@ -444,7 +445,7 @@ footer .jp{color:var(--rouge)}
       <div class="coord"><span class="plus">+</span>bonjour@atelier-yohaku.be</div>
       <div class="coord"><span class="plus">+</span>+32 2 000 00 00</div>
       <div class="photo" style="height:200px;margin-top:26px">
-        <img src="https://picsum.photos/seed/yohaku-atelier/720/420?grayscale" alt="L'atelier face au canal" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
+        <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=720&h=420&fit=crop&q=72&auto=format" alt="L'atelier face au canal" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
         <span class="ph-label">L'atelier · Molenbeek</span>
       </div>
     </div>
@@ -1962,27 +1963,27 @@ function createRenderer(canvas){
    DONNÉES PROJETS
    ============================================================ */
 const PROJECTS = [
- {id:'gare-nord', cat:'urbain', catLabel:'Masterplan', title:'Quartier de la Gare Nord', lieu:'Bruxelles, Belgique', annee:'2025', seed:'yohaku-urb1', model:'masterplan',
+ {id:'gare-nord', cat:'urbain', catLabel:'Masterplan', title:'Quartier de la Gare Nord', lieu:'Bruxelles, Belgique', annee:'2025', seed:'yohaku-urb1', photo:'1477959858617-67f85cf4f1df', model:'masterplan',
   specs:{'Surface':'12 ha','Programme':'Mixte gare + logements','Maîtrise d\u2019ouvrage':'Région BXL','Statut':'En cours','Budget':'84 M€','Livraison':'2029'},
   timeline:[{d:'2023 T2',l:'Concours remporté',s:'done'},{d:'2024 T1',l:'Masterplan approuvé',s:'done'},{d:'2025 T3',l:'Permis — phase 1',s:'now'},{d:'2027',l:'Chantier infrastructures',s:''},{d:'2029',l:'Livraison phase 1',s:''}],
   desc:['Reconnexion d\u2019un pôle ferroviaire au centre-ville : la voie, longtemps coupure, devient colonne vertébrale. Logements, programmes universitaires et musée s\u2019accrochent à une promenade plantée continue.','Le plan laisse un tiers du site non bâti — places, vergers, zones humides — selon le principe du yohaku : c\u2019est le vide qui donne sa valeur au plein.']},
- {id:'verger', cat:'logement', catLabel:'Logement', title:'Maisons du Verger', lieu:'Namur, Belgique', annee:'2024', seed:'yohaku-log1', model:'houses',
+ {id:'verger', cat:'logement', catLabel:'Logement', title:'Maisons du Verger', lieu:'Namur, Belgique', annee:'2024', seed:'yohaku-log1', photo:'1480074568708-e7b720bb3f09', model:'houses',
   specs:{'Surface':'4 800 m²','Programme':'32 logements','Maîtrise d\u2019ouvrage':'Coopérative','Statut':'Livré','Budget':'9,6 M€','Certification':'Passif'},
   timeline:[{d:'2021',l:'Esquisse & ateliers habitants',s:'done'},{d:'2022 T2',l:'Permis obtenu',s:'done'},{d:'2023',l:'Chantier bois',s:'done'},{d:'2024 T3',l:'Livraison & plantation du verger',s:'done'}],
   desc:['Trente-deux logements en bande autour d\u2019un verger partagé. Structure bois locale, toitures à pente japonaise, seuils généreux : l\u2019engawa belge.','Chaque maison possède deux façades de vie — côté rue, côté verger — et aucune clôture : les limites sont dessinées par les arbres.']},
- {id:'engawa', cat:'public', catLabel:'Équipement', title:'Médiathèque Engawa', lieu:'Gand, Belgique', annee:'2024', seed:'yohaku-pub1', model:'pavilion',
+ {id:'engawa', cat:'public', catLabel:'Équipement', title:'Médiathèque Engawa', lieu:'Gand, Belgique', annee:'2024', seed:'yohaku-pub1', photo:'1521587760476-6c12a4b040da', model:'pavilion',
   specs:{'Surface':'3 200 m²','Programme':'Médiathèque + café','Maîtrise d\u2019ouvrage':'Ville de Gand','Statut':'Livré','Budget':'11,2 M€','Prix':'Prix Belge d\u2019Arch. 2025'},
   timeline:[{d:'2020',l:'Concours remporté',s:'done'},{d:'2021',l:'Études & permis',s:'done'},{d:'2022-23',l:'Chantier',s:'done'},{d:'2024 T1',l:'Ouverture au public',s:'done'}],
   desc:['Une véranda habitée entre le parc et la rue : la limite devient un lieu, comme l\u2019engawa des maisons japonaises.','Un grand toit plat porté par une forêt de colonnes fines abrite des salles de lecture qui s\u2019ouvrent entièrement sur le parc en été.']},
- {id:'croisement', cat:'urbain', catLabel:'Masterplan', title:'Croisement à niveau — Révision', lieu:'Louvain, Belgique', annee:'2023', seed:'yohaku-urb2', model:'intersection',
+ {id:'croisement', cat:'urbain', catLabel:'Masterplan', title:'Croisement à niveau — Révision', lieu:'Louvain, Belgique', annee:'2023', seed:'yohaku-urb2', photo:'1519501025264-65ba15a82390', model:'intersection',
   specs:{'Surface':'2,1 ha','Programme':'Espace public','Maîtrise d\u2019ouvrage':'Ville de Louvain','Statut':'Livré','Budget':'4,3 M€','Trafic apaisé':'-46 %'},
   timeline:[{d:'2021',l:'Étude de mobilité',s:'done'},{d:'2022 T1',l:'Concertation citoyenne',s:'done'},{d:'2022 T4',l:'Chantier en site occupé',s:'done'},{d:'2023 T2',l:'Inauguration de la place',s:'done'}],
   desc:['Pacification d\u2019une intersection routière : la voiture cède la priorité, le piéton retrouve la diagonale.','Le carrefour devient une place traversante : un sol unique, des croix peintes au sol comme sur nos plans, et quatre bâtiments d\u2019angle qui tiennent l\u2019espace.']},
- {id:'komorebi', cat:'logement', catLabel:'Logement', title:'Tours Komorebi', lieu:'Anvers, Belgique', annee:'2023', seed:'yohaku-log2', model:'tower',
+ {id:'komorebi', cat:'logement', catLabel:'Logement', title:'Tours Komorebi', lieu:'Anvers, Belgique', annee:'2023', seed:'yohaku-log2', photo:'1460317442991-0ec209397118', model:'tower',
   specs:{'Hauteur':'72 m · 22 étages','Programme':'140 logements','Maîtrise d\u2019ouvrage':'Privé + AIS','Statut':'Livré','Budget':'38 M€','Structure':'Noyau béton + bois'},
   timeline:[{d:'2019',l:'Concours remporté',s:'done'},{d:'2020',l:'Permis & études',s:'done'},{d:'2021-22',l:'Chantier',s:'done'},{d:'2023 T4',l:'Livraison',s:'done'}],
   desc:['Deux tours décalées qui filtrent la lumière comme les feuillages — komorebi, la lumière qui passe entre les arbres.','Les plateaux pivotent légèrement à chaque niveau : chaque logement gagne une orientation propre, et la façade devient une résille vivante. La grande maquette de la section « Volume » montre ce principe en mouvement.']},
- {id:'tarn', cat:'public', catLabel:'Équipement', title:'Pavillon du Musée Tarn', lieu:'Bruxelles, Belgique', annee:'2022', seed:'yohaku-pub2', model:'origami',
+ {id:'tarn', cat:'public', catLabel:'Équipement', title:'Pavillon du Musée Tarn', lieu:'Bruxelles, Belgique', annee:'2022', seed:'yohaku-pub2', photo:'1518998053901-5348d3961a04', model:'origami',
   specs:{'Surface':'860 m²','Programme':'Extension muséale','Maîtrise d\u2019ouvrage':'Fondation Tarn','Statut':'Livré','Budget':'3,1 M€','Structure':'Charpente CLT'},
   timeline:[{d:'2020',l:'Commande directe',s:'done'},{d:'2021 T1',l:'Permis patrimoine',s:'done'},{d:'2021-22',l:'Préfabrication & montage',s:'done'},{d:'2022 T3',l:'Ouverture',s:'done'}],
   desc:['Extension muséale en charpente apparente : un origami de bois posé dans la cour historique.','Le volume plié ne touche les façades classées en aucun point ; il repose sur un socle de pierre bleue et se lit comme une maquette à l\u2019échelle 1.']}
@@ -1991,6 +1992,11 @@ const PROJECTS = [
 /* ============================================================
    GÉNÉRATION DES CARTES
    ============================================================ */
+/* Construit l'URL d'une photo de projet (Unsplash) ; repli pointillé si hors-ligne via onerror */
+function photoURL(p,w,h){
+  if(p.photo) return `https://images.unsplash.com/photo-${p.photo}?w=${w}&h=${h}&fit=crop&q=72&auto=format`;
+  return `https://picsum.photos/seed/${p.seed}/${w}/${h}?grayscale`;
+}
 const grid=document.getElementById('projectGrid');
 PROJECTS.forEach((p,i)=>{
   const a=document.createElement('article');
@@ -1999,7 +2005,7 @@ PROJECTS.forEach((p,i)=>{
   a.setAttribute('role','button'); a.setAttribute('aria-label','Ouvrir la fiche : '+p.title);
   a.innerHTML=`
     <div class="thumb">
-      <img src="https://picsum.photos/seed/${p.seed}/660/440?grayscale" alt="${p.title}" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
+      <img src="${photoURL(p,660,440)}" alt="${p.title}" loading="lazy" onerror="this.parentElement.classList.add('fallback');this.remove()">
       <span class="open-hint">+ Ouvrir la fiche</span>
     </div>
     <div class="body">
@@ -2026,114 +2032,180 @@ const viewer=(function(){
   const renderer=createRenderer(canvas);
   if(!renderer) return null;
   const scene=new THREE.Scene();
+  scene.fog=new THREE.Fog(0xFFFFFF,34,82); // brume blanche : profondeur sur fond papier
   const camera=new THREE.PerspectiveCamera(38,1,.1,300);
-  let model=null, rotY=.6, rotX=.35, targetRotY=.6, targetRotX=.35, dist=26, auto=true, raf=null, dragging=false, lx=0, ly=0;
+  let model=null, rotY=.6, rotX=.35, targetRotY=.6, targetRotX=.35, dist=26, lookY=2.4, auto=true, raf=null, dragging=false, lx=0, ly=0;
 
-  const inkLine=()=>new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.85});
+  const inkLine=()=>new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.9});
   const redLine=()=>new THREE.LineBasicMaterial({color:ROUGE_VIF});
+  const inkFill=()=>new THREE.MeshBasicMaterial({color:INK});
+  const softFill=()=>new THREE.MeshBasicMaterial({color:0xF4F4F2});
   const redMesh=()=>new THREE.MeshBasicMaterial({color:ROUGE});
+  const glassFill=()=>new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.45});
   function edges(geo,mat){return new THREE.LineSegments(new THREE.EdgesGeometry(geo),mat)}
+  // volume plein : face légèrement rentrée + arêtes nettes (rendu maquette solide, marche aussi en SVG)
+  function solid(geo,fill,line){
+    const grp=new THREE.Group();
+    const f=geo.clone(); f.scale(.992,.992,.992);
+    grp.add(new THREE.Mesh(f,fill));
+    grp.add(edges(geo,line||inkLine()));
+    return grp;
+  }
+  // bâtiment posé au sol en (x,z)
   function block(w,h,d,x,z,red){
-    const g=new THREE.Group();
     const geo=new THREE.BoxGeometry(w,h,d); geo.translate(0,h/2,0);
-    if(red) g.add(new THREE.Mesh(geo,redMesh()));
-    g.add(edges(geo,red?redLine():inkLine()));
+    const g=solid(geo, red?redMesh():softFill(), red?redLine():inkLine());
     g.position.set(x,0,z); return g;
   }
-  function ground(g,r){
+  // arbre stylisé (tronc + houppier conique)
+  function tree(x,z,s){
+    s=s||1; const g=new THREE.Group();
+    const tr=new THREE.CylinderGeometry(.06,.09,.9*s,5); tr.translate(0,.45*s,0);
+    g.add(new THREE.Mesh(tr,inkFill()));
+    const cr=new THREE.ConeGeometry(.6*s,1.4*s,7); cr.translate(0,1.35*s,0);
+    g.add(new THREE.Mesh(cr,softFill())); g.add(edges(cr,inkLine()));
+    g.position.set(x,0,z); return g;
+  }
+  function ground(g){
     const pts=[]; const n=14;
     for(let x=-n;x<=n;x+=2){for(let z=-n;z<=n;z+=2){const s=.16;pts.push(x-s,0,z,x+s,0,z,x,0,z-s,x,0,z+s);}}
     const geo=new THREE.BufferGeometry();
     geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
-    g.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.25})));
+    g.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.22})));
   }
 
   const builders={
+    // QUARTIER GARE NORD — voie ferrée, gare, îlots de logements, grand parc (le vide)
     masterplan(g){
       ground(g);
-      // voie ferrée rouge en diagonale
-      const rail=new THREE.Mesh(new THREE.BoxGeometry(.7,.1,34),redMesh());
-      rail.rotation.y=.4; g.add(rail);
-      for(let i=0;i<26;i++){
-        const x=(Math.random()-.5)*22, z=(Math.random()-.5)*22;
-        if(Math.abs(x*Math.cos(.4)+z*Math.sin(.4))<2) continue;
-        g.add(block(1.4+Math.random()*1.4,.6+Math.random()*4.4,1.4+Math.random()*1.4,x,z,Math.random()<.12));
+      // voie ferrée rouge en diagonale (2 rails + traverses) + parvis
+      const rail=new THREE.Group(); rail.rotation.y=.42;
+      [-.5,.5].forEach(o=>{const r=new THREE.BoxGeometry(.16,.16,28);r.translate(o,.08,0);rail.add(new THREE.Mesh(r,redMesh()));rail.add(edges(r,redLine()));});
+      const tieMat=new THREE.MeshBasicMaterial({color:0x5A0A0E});
+      for(let z=-13;z<=13;z+=1.4){const t=new THREE.BoxGeometry(1.4,.1,.3);t.translate(0,.05,z);rail.add(new THREE.Mesh(t,tieMat));}
+      g.add(rail);
+      // gare : grand volume vitré au-dessus de la voie
+      const stationGeo=new THREE.BoxGeometry(4.2,2.6,4.2); stationGeo.translate(0,1.3,0);
+      const station=solid(stationGeo,glassFill(),redLine()); station.rotation.y=.42; g.add(station);
+      // îlots de logements (grille régulière) côté "ville"
+      for(let i=0;i<3;i++)for(let j=0;j<4;j++){
+        const x=4.5+i*2.7, z=-7+j*3, h=2.4+((i*2+j)%4)*1.5;
+        g.add(block(2,h,2.2,x,z,(i===1&&j===1)));
       }
-      dist=30;
+      // grands équipements (musée / université) côté opposé : volumes larges et bas
+      g.add(block(4.6,3.2,3,-7,-4,false));
+      g.add(block(3.4,2.4,4.4,-8.4,2.6,false));
+      // parc (le vide) : quadrant laissé libre, planté
+      for(let i=0;i<6;i++) tree(-4+ (i%3)*2.2, 7+ Math.floor(i/3)*2.4, .9+ (i%2)*.3);
+      // place : anneau rouge au pied de la gare
+      const plaza=new THREE.RingGeometry(3.2,3.5,40); plaza.rotateX(-Math.PI/2); plaza.translate(0,.05,0);
+      g.add(new THREE.Mesh(plaza,redMesh()));
+      dist=34;
     },
+    // MAISONS DU VERGER — deux bandes de maisons autour d'un verger central
     houses(g){
       ground(g);
-      for(let r=0;r<3;r++){
+      [-7,7].forEach((bz,b)=>{
         for(let i=0;i<6;i++){
-          const x=-9+i*3.6, z=-6+r*6;
-          const h=2+Math.random()*.5;
-          const base=block(2.4,h,2.8,x,z,false);
-          const roofGeo=new THREE.ConeGeometry(1.9,1.4,4);
-          roofGeo.rotateY(Math.PI/4); roofGeo.translate(0,h+.7,0);
-          base.add(edges(roofGeo,(r===1&&i===2)?redLine():inkLine()));
-          if(r===1&&i===2) base.add(new THREE.Mesh(roofGeo,redMesh()));
+          const x=-9+i*3.6, h=2+((i+b)%2)*.5;
+          const base=block(2.4,h,2.6,x,bz,false);
+          const roofGeo=new THREE.ConeGeometry(1.95,1.5,4); roofGeo.rotateY(Math.PI/4); roofGeo.translate(0,h+.75,0);
+          const red=(b===0&&i===2);
+          base.add(new THREE.Mesh(roofGeo,red?redMesh():softFill()));
+          base.add(edges(roofGeo,red?redLine():inkLine()));
           g.add(base);
         }
-      }
-      // rangée d'arbres (le verger)
-      for(let i=0;i<7;i++){
-        const t=new THREE.Group();
-        const trunk=new THREE.BoxGeometry(.12,1,.12); trunk.translate(0,.5,0);
-        const crown=new THREE.SphereGeometry(.7,6,5); crown.translate(0,1.5,0);
-        t.add(edges(trunk,inkLine())); t.add(edges(crown,inkLine()));
-        t.position.set(-9+i*3,0,0); g.add(t);
-      }
-      dist=24;
+      });
+      // verger central (entre les deux bandes, z autour de 0 — plus de chevauchement)
+      for(let i=0;i<7;i++){ tree(-9+i*3,-1.6,.85+(i%2)*.25); tree(-9+i*3,1.6,.85+((i+1)%2)*.25); }
+      // allée centrale en pierre
+      const path=new THREE.BoxGeometry(18,.05,1.1); path.translate(0,.03,0);
+      g.add(new THREE.Mesh(path,softFill())); g.add(edges(path,inkLine()));
+      dist=25;
     },
+    // MÉDIATHÈQUE ENGAWA — grand toit fin sur forêt de colonnes, volume de lecture vitré
     pavilion(g){
       ground(g);
-      const roof=new THREE.BoxGeometry(16,.5,11); roof.translate(0,4.4,0);
-      g.add(edges(roof,inkLine()));
-      g.add(new THREE.Mesh(new THREE.BoxGeometry(16,.5,11).translate(0,4.4,0),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.85})));
-      for(let x=-3;x<=3;x++){for(let z=-2;z<=2;z+=4){
-        const col=new THREE.BoxGeometry(.16,4.2,.16); col.translate(x*2.2,2.1,z*1.9);
-        g.add(edges(col,inkLine()));
-      }}
-      const inner=new THREE.BoxGeometry(9,3,6); inner.translate(0,1.5,0);
-      g.add(edges(inner,redLine()));
-      dist=22;
+      const W=16,D=11,rh=4.6;
+      // terrasse / socle (l'engawa)
+      const deck=new THREE.BoxGeometry(W+2.4,.18,D+2.4); deck.translate(0,.09,0);
+      g.add(new THREE.Mesh(deck,softFill())); g.add(edges(deck,inkLine()));
+      // forêt de colonnes fines
+      for(let ix=-3;ix<=3;ix++)for(let iz=-2;iz<=2;iz++){
+        const c=new THREE.BoxGeometry(.14,rh,.14); c.translate(ix*2.3,rh/2,iz*2.4);
+        g.add(new THREE.Mesh(c,inkFill()));
+      }
+      // volume de lecture vitré (cœur)
+      const innerGeo=new THREE.BoxGeometry(8.6,2.9,5.8); innerGeo.translate(0,1.55,0);
+      g.add(solid(innerGeo,glassFill(),redLine()));
+      // grand toit plat
+      const roofGeo=new THREE.BoxGeometry(W,.5,D); roofGeo.translate(0,rh+.25,0);
+      g.add(solid(roofGeo,softFill(),inkLine()));
+      // arbres du parc en lisière
+      tree(-W/2-1.8,4.2,1.1); tree(W/2+1.6,-3.4,1); tree(W/2+2,3.6,.8);
+      dist=23;
     },
+    // CROISEMENT — place traversante : sol unique, passages cloutés, diagonale, 4 angles
     intersection(g){
       ground(g);
-      const roadMat=new THREE.MeshBasicMaterial({color:INK});
-      const r1=new THREE.Mesh(new THREE.BoxGeometry(30,.08,2.6),roadMat); g.add(r1);
-      const r2=new THREE.Mesh(new THREE.BoxGeometry(2.6,.08,30),roadMat); g.add(r2);
-      const plaza=new THREE.RingGeometry(3.4,3.7,40); plaza.rotateX(-Math.PI/2); plaza.translate(0,.06,0);
-      g.add(new THREE.Mesh(plaza,redMesh()));
-      [[6,6],[-6,6],[6,-6],[-6,-6]].forEach(([x,z],i)=>{
-        g.add(block(3.4,2.6+i*1.1,3.4,x,z,i===2));
-      });
-      dist=26;
+      const plazaGeo=new THREE.BoxGeometry(18,.06,18); plazaGeo.translate(0,.03,0);
+      g.add(solid(plazaGeo,softFill(),inkLine()));
+      const roadMat=inkFill();
+      const rA=new THREE.BoxGeometry(18,.09,2.8); rA.translate(0,.07,0); g.add(new THREE.Mesh(rA,roadMat));
+      const rB=new THREE.BoxGeometry(2.8,.09,18); rB.translate(0,.07,0); g.add(new THREE.Mesh(rB,roadMat));
+      // passages cloutés (croix blanches)
+      const stripe=new THREE.MeshBasicMaterial({color:0xffffff});
+      for(let i=-2;i<=2;i++){
+        const a=new THREE.BoxGeometry(.3,.02,2.6); a.translate(i*.55,.13,4.6); g.add(new THREE.Mesh(a,stripe));
+        const b=new THREE.BoxGeometry(.3,.02,2.6); b.translate(i*.55,.13,-4.6); g.add(new THREE.Mesh(b,stripe));
+        const c=new THREE.BoxGeometry(2.6,.02,.3); c.translate(4.6,.13,i*.55); g.add(new THREE.Mesh(c,stripe));
+        const d=new THREE.BoxGeometry(2.6,.02,.3); d.translate(-4.6,.13,i*.55); g.add(new THREE.Mesh(d,stripe));
+      }
+      // diagonale piétonne rouge + place centrale
+      const diag=new THREE.BoxGeometry(1.3,.05,22); diag.rotateY(Math.PI/4); diag.translate(0,.12,0);
+      g.add(new THREE.Mesh(diag,redMesh()));
+      const ring=new THREE.RingGeometry(2.2,2.5,40); ring.rotateX(-Math.PI/2); ring.translate(0,.16,0);
+      g.add(new THREE.Mesh(ring,redMesh()));
+      // 4 immeubles d'angle qui tiennent l'espace
+      [[6.4,6.4],[-6.4,6.4],[6.4,-6.4],[-6.4,-6.4]].forEach(([x,z],i)=>g.add(block(3.4,3+i*1.2,3.4,x,z,i===2)));
+      tree(0,8.2,1); tree(8.2,0,1); tree(-8.2,0,1); tree(0,-8.2,1);
+      dist=27;
     },
+    // TOURS KOMOREBI — une tour solide, plateaux pleins torsadés, noyau, couronne
     tower(g){
       ground(g);
-      const FL=22;
-      const core=new THREE.CylinderGeometry(.9,.9,FL*.62,10); core.translate(0,FL*.31,0);
-      g.add(new THREE.Mesh(core,redMesh()));
+      const FL=22, FH=.62, HALF=2.4;
+      const coreGeo=new THREE.CylinderGeometry(.95,.95,FL*FH,14); coreGeo.translate(0,FL*FH/2+.3,0);
+      g.add(new THREE.Mesh(coreGeo,redMesh())); g.add(edges(coreGeo,redLine()));
       for(let i=0;i<FL;i++){
-        const geo=new THREE.BoxGeometry(4.6,.4,4.6);
-        const s=new THREE.Group();
-        s.add(edges(geo,(i%6===0)?redLine():inkLine()));
-        s.position.y=i*.62+.3; s.rotation.y=i*.12;
-        g.add(s);
+        const w=HALF*2*(1-(i/FL)*.18);
+        const geo=new THREE.BoxGeometry(w,FH*.6,w); geo.translate(0,0,0);
+        const red=(i%6===0);
+        const s=solid(geo,red?redMesh():softFill(),red?redLine():inkLine());
+        s.position.y=i*FH+.55; s.rotation.y=i*.1; g.add(s);
       }
-      dist=24;
+      // couronne / belvédère
+      const crownGeo=new THREE.BoxGeometry(HALF*1.5,FH*1.4,HALF*1.5); crownGeo.translate(0,0,0);
+      const crown=solid(crownGeo,glassFill(),redLine()); crown.position.y=FL*FH+1; crown.rotation.y=FL*.1; g.add(crown);
+      const ant=new THREE.CylinderGeometry(.04,.04,2.4,6); ant.translate(0,FL*FH+2.4,0); g.add(new THREE.Mesh(ant,redMesh()));
+      dist=34; lookY=7;
     },
+    // PAVILLON MUSÉE TARN — origami de bois plié sur socle de pierre bleue
     origami(g){
       ground(g);
-      const plinth=new THREE.BoxGeometry(8,.8,8); plinth.translate(0,.4,0);
-      g.add(edges(plinth,inkLine()));
-      const ico=new THREE.IcosahedronGeometry(3.1,0); ico.translate(0,4,0);
-      g.add(new THREE.Mesh(ico,new THREE.MeshBasicMaterial({color:0xffffff})));
-      g.add(edges(ico,redLine()));
-      const door=new THREE.BoxGeometry(1.4,2.2,.15); door.translate(0,1.9,4.05);
-      g.add(edges(door,inkLine()));
-      dist=20;
+      // socle de pierre bleue (sombre)
+      const plinthGeo=new THREE.BoxGeometry(8,.9,8); plinthGeo.translate(0,.45,0);
+      g.add(solid(plinthGeo,inkFill(),inkLine()));
+      // base vitrée
+      const glassGeo=new THREE.BoxGeometry(5.2,1.8,5.2); glassGeo.translate(0,1.8,0);
+      g.add(solid(glassGeo,glassFill(),inkLine()));
+      // volume plié facetté (toit origami) — pyramide à 5 pans
+      const roofGeo=new THREE.ConeGeometry(3.9,3.6,5); roofGeo.rotateY(.35); roofGeo.translate(0,4.5,0);
+      g.add(new THREE.Mesh(roofGeo,softFill())); g.add(edges(roofGeo,redLine()));
+      // entrée
+      const door=new THREE.BoxGeometry(1.3,1.6,.16); door.translate(0,1.7,2.65);
+      g.add(solid(door,glassFill(),inkLine()));
+      dist=21;
     }
   };
 
@@ -2147,8 +2219,8 @@ const viewer=(function(){
     if(auto && !dragging && !reduceMotion) targetRotY+=.004;
     rotY+=(targetRotY-rotY)*.08; rotX+=(targetRotX-rotX)*.08;
     rotX=Math.max(.08,Math.min(1.25,rotX));
-    camera.position.set(Math.sin(rotY)*Math.cos(rotX)*dist, Math.sin(rotX)*dist, Math.cos(rotY)*Math.cos(rotX)*dist);
-    camera.lookAt(0,2.4,0);
+    camera.position.set(Math.sin(rotY)*Math.cos(rotX)*dist, Math.sin(rotX)*dist+lookY*.6, Math.cos(rotY)*Math.cos(rotX)*dist);
+    camera.lookAt(0,lookY,0);
     renderer.render(scene,camera);
     raf=requestAnimationFrame(frame);
   }
@@ -2169,6 +2241,7 @@ const viewer=(function(){
     show(type){
       if(model){scene.remove(model);model.traverse(o=>{o.geometry&&o.geometry.dispose();o.material&&o.material.dispose&&o.material.dispose();});}
       model=new THREE.Group();
+      dist=26; lookY=2.4;
       (builders[type]||builders.tower)(model);
       scene.add(model);
       targetRotY=.6;targetRotX=.35;rotY=.6;rotX=.35;
@@ -2192,7 +2265,7 @@ function openProject(id){
   photo.classList.remove('fallback');
   let img=document.getElementById('pmImg');
   if(!img){img=document.createElement('img');img.id='pmImg';photo.prepend(img);}
-  img.src=`https://picsum.photos/seed/${p.seed}-large/1100/740?grayscale`;
+  img.src=photoURL(p,1100,740);
   img.alt=p.title;
   img.onerror=()=>{photo.classList.add('fallback');img.remove();};
   document.getElementById('pmImgLabel').textContent=p.title+' · '+p.lieu.split(',')[0];
@@ -2238,29 +2311,43 @@ document.addEventListener('keydown',e=>{
   const renderer=createRenderer(canvas);
   if(!renderer) return;
   const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(40,1,.1,200);
-  const lineMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.85});
+  scene.fog=new THREE.Fog(0xFFFFFF,28,78); // les lointains se fondent dans le papier
+  const camera=new THREE.PerspectiveCamera(42,1,.1,200);
+  const tallMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.55});
+  const lowMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.32});
   const redMat=new THREE.MeshBasicMaterial({color:ROUGE});
-  const buildings=[]; const N=11,SP=2.2;
+  const redLineMat=new THREE.LineBasicMaterial({color:ROUGE_VIF});
+  const buildings=[];
+  const N=14, SP=2.1, C=(N-1)/2;
+  const onBlvd=(x,z)=>Math.abs((x-C)-(z-C))<1.05;          // avenue diagonale
+  const inPark=(x,z)=>(x>N-5 && z<4);                        // parc : le vide
   for(let x=0;x<N;x++)for(let z=0;z<N;z++){
-    if(Math.random()<.22)continue;
-    const h=.6+Math.pow(Math.random(),2.2)*7;
-    const geo=new THREE.BoxGeometry(1.25,h,1.25); geo.translate(0,h/2,0);
+    if(onBlvd(x,z)||inPark(x,z))continue;
+    if(Math.random()<.14)continue;
+    const d=Math.hypot(x-C,z-C)/C;                           // 0 au centre → 1 au bord
+    const h=.6+Math.pow(Math.max(0,1-d),1.8)*9*(.55+Math.random()*.6)+Math.random()*1;
+    const w=1+Math.random()*.5;
+    const geo=new THREE.BoxGeometry(w,h,w); geo.translate(0,h/2,0);
     const group=new THREE.Group();
-    if(Math.random()<.1)group.add(new THREE.Mesh(geo,redMat));
-    group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),lineMat));
-    group.position.set((x-(N-1)/2)*SP,0,(z-(N-1)/2)*SP);
-    group.scale.y=.001; group.userData.delay=(x+z)*55+Math.random()*250;
+    const red=Math.random()<.06;
+    if(red)group.add(new THREE.Mesh(geo,redMat));
+    group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),red?redLineMat:(h>4?tallMat:lowMat)));
+    group.position.set((x-C)*SP,0,(z-C)*SP);
+    group.scale.y=.001; group.userData.delay=(x+z)*42+Math.random()*220;
     scene.add(group); buildings.push(group);
   }
+  // avenue rouge en diagonale
+  const blvd=new THREE.Mesh(new THREE.BoxGeometry(1,.05,N*SP*1.35),redMat);
+  blvd.rotation.y=-Math.PI/4; blvd.position.y=.03; scene.add(blvd);
+  // sol pointillé
   const pts=[];
   for(let x=0;x<=N;x++)for(let z=0;z<=N;z++){
-    const cx=(x-N/2)*SP,cz=(z-N/2)*SP,s=.18;
+    const cx=(x-C)*SP,cz=(z-C)*SP,s=.16;
     pts.push(cx-s,0,cz,cx+s,0,cz,cx,0,cz-s,cx,0,cz+s);
   }
   const crossGeo=new THREE.BufferGeometry();
   crossGeo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
-  scene.add(new THREE.LineSegments(crossGeo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.3})));
+  scene.add(new THREE.LineSegments(crossGeo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.18})));
   let mouseX=0;
   window.addEventListener('mousemove',e=>{mouseX=(e.clientX/window.innerWidth-.5);},{passive:true});
   const t0=performance.now();
@@ -2277,10 +2364,10 @@ document.addEventListener('keydown',e=>{
     });
     const heroH=document.querySelector('.hero').offsetHeight;
     const p=Math.min(1,window.scrollY/(heroH*1.1));
-    const angle=-.6+p*1.5+(reduceMotion?0:mouseX*.25);
-    const radius=26-p*7, height=12+p*14;
+    const angle=-.5+p*1.4+(reduceMotion?0:mouseX*.22);
+    const radius=30-p*8, height=6.5+p*16;
     camera.position.set(Math.sin(angle)*radius,height,Math.cos(angle)*radius);
-    camera.lookAt(0,2.2,0);
+    camera.lookAt(0,3,0);
     renderer.render(scene,camera);
     if(!reduceMotion)requestAnimationFrame(frame);
   }
@@ -2304,36 +2391,49 @@ document.addEventListener('keydown',e=>{
   const whiteLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.9});
   const greyLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.32});
   const redLine=new THREE.LineBasicMaterial({color:ROUGE_VIF});
-  const redMesh=new THREE.MeshBasicMaterial({color:ROUGE,transparent:true,opacity:.95});
+  const slabFill=new THREE.MeshBasicMaterial({color:0xF2F2F0});   // plateaux pleins (opaques)
+  const slabRedFill=new THREE.MeshBasicMaterial({color:ROUGE});
 
   const FLOORS=40, FH=.55, HALF=3;
   const slabs=[];
-  const slabGeoA=new THREE.BoxGeometry(HALF*2,FH*.78,HALF*2);
-  const slabGeoB=new THREE.BoxGeometry(HALF*1.74,FH*.78,HALF*1.74);
+  const slabGeoA=new THREE.BoxGeometry(HALF*2,FH*.82,HALF*2);
+  const slabGeoB=new THREE.BoxGeometry(HALF*1.74,FH*.82,HALF*1.74);
   for(let i=0;i<FLOORS;i++){
     const g=new THREE.Group();
     const isRed=(i%8===0);
     const geo=(i%2===0)?slabGeoA:slabGeoB;
-    if(isRed)g.add(new THREE.Mesh(geo,redMesh));
+    g.add(new THREE.Mesh(geo,isRed?slabRedFill:slabFill));   // plateau plein
     g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),isRed?redLine:whiteLine));
     g.position.y=i*FH; scene.add(g); slabs.push(g);
   }
 
-  // NOYAU central rouge
-  const coreGeo=new THREE.CylinderGeometry(1.05,1.05,FLOORS*FH,12,1,true);
+  // NOYAU central rouge — plein et opaque
+  const coreGeo=new THREE.CylinderGeometry(1.05,1.05,FLOORS*FH,16);
   coreGeo.translate(0,FLOORS*FH/2,0);
-  const core=new THREE.Mesh(coreGeo,new THREE.MeshBasicMaterial({color:ROUGE,transparent:true,opacity:.9,side:THREE.DoubleSide}));
-  const coreEdges=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(1.05,1.05,FLOORS*FH,12).translate(0,FLOORS*FH/2,0)),redLine);
+  const core=new THREE.Mesh(coreGeo,new THREE.MeshBasicMaterial({color:ROUGE}));
+  const coreEdges=new THREE.LineSegments(new THREE.EdgesGeometry(coreGeo),redLine);
   scene.add(core); scene.add(coreEdges);
 
-  // ARÊTES VERTICALES CONTINUES (résille torsadée, recalculée chaque image)
-  const segs=(FLOORS-1)*4;
+  // SOCLE / podium d'entrée
+  const podGeo=new THREE.BoxGeometry(HALF*2.6,FH*2.4,HALF*2.6); podGeo.translate(0,FH*1.2,0);
+  const podium=new THREE.Group();
+  podium.add(new THREE.Mesh(podGeo,slabFill));
+  podium.add(new THREE.LineSegments(new THREE.EdgesGeometry(podGeo),whiteLine));
+  scene.add(podium);
+
+  // ANTENNE / couronne (révélée en fin de construction)
+  const antGeo=new THREE.CylinderGeometry(.05,.05,3.2,6); antGeo.translate(0,FLOORS*FH+1.6,0);
+  const antenna=new THREE.Mesh(antGeo,new THREE.MeshBasicMaterial({color:ROUGE_VIF}));
+  scene.add(antenna);
+
+  // ARÊTES VERTICALES CONTINUES (résille de façade torsadée, 8 montants, recalculée chaque image)
+  const corners=[[HALF,HALF],[HALF,0],[HALF,-HALF],[0,-HALF],[-HALF,-HALF],[-HALF,0],[-HALF,HALF],[0,HALF]];
+  const segs=(FLOORS-1)*corners.length;
   const edgePos=new Float32Array(segs*2*3);
   const edgeGeo=new THREE.BufferGeometry();
   edgeGeo.setAttribute('position',new THREE.BufferAttribute(edgePos,3));
   const edgeLines=new THREE.LineSegments(edgeGeo,greyLine);
   scene.add(edgeLines);
-  const corners=[[HALF,HALF],[HALF,-HALF],[-HALF,-HALF],[-HALF,HALF]];
   const tmp=new THREE.Vector3();
 
   // sol pointillé + anneau de chantier
@@ -2386,10 +2486,10 @@ document.addEventListener('keydown',e=>{
       s.visible=e>.02;
     });
 
-    // mise à jour de la résille torsadée
+    // mise à jour de la résille torsadée (8 montants)
     let w=0;
     for(let i=0;i<FLOORS-1;i++){
-      for(let c=0;c<4;c++){
+      for(let c=0;c<corners.length;c++){
         const a=slabs[i],b=slabs[i+1];
         tmp.set(corners[c][0],0,corners[c][1]).applyEuler(a.rotation).multiply(a.scale).add(a.position);
         edgePos[w++]=tmp.x;edgePos[w++]=tmp.y;edgePos[w++]=tmp.z;
@@ -2401,6 +2501,7 @@ document.addEventListener('keydown',e=>{
     edgeLines.visible=p>.18;
     greyLine.opacity=.1+Math.min(.45,p*.6);
 
+    antenna.visible=rise>.985;
     ring.rotation.y=performance.now()/4000;
 
     const angle=.6+p*2.4, camH=4+p*16, radius=27-p*7;
