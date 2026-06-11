@@ -83,11 +83,16 @@ nav.hide{transform:translateY(-102%)}
 .eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;display:flex;align-items:center;gap:14px;margin-bottom:26px}
 .eyebrow::before{content:'';width:48px;height:2px;background:var(--rouge)}
 .eyebrow .jp{color:var(--rouge);letter-spacing:.1em}
-h1{font-family:var(--display);font-weight:900;font-size:clamp(2.4rem,5.4vw,4.7rem);line-height:1.02;letter-spacing:-.01em;text-transform:uppercase}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(2.3rem,5vw,4.4rem);line-height:1.04;letter-spacing:.005em;text-transform:uppercase;text-wrap:balance}
 h1 .accent{position:relative;white-space:nowrap;color:var(--paper)}
-h1 .accent::after{content:'';position:absolute;left:-3px;right:-3px;top:.14em;bottom:.14em;background:var(--ink);z-index:-1;transform-origin:left;animation:paint 1s .5s cubic-bezier(.7,0,.2,1) backwards}
+h1 .accent::after{content:'';position:absolute;left:-6px;right:-6px;top:.1em;bottom:.08em;background:var(--ink);z-index:-1;transform-origin:left;animation:paint 1s .5s cubic-bezier(.7,0,.2,1) backwards}
 @keyframes paint{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-.hero p{margin-top:26px;max-width:46ch;font-size:1.06rem;color:#333}
+.hero p{margin-top:24px;max-width:46ch;font-size:1.04rem;font-weight:500;color:#3a3a3e;letter-spacing:.01em}
+.hero-hint{margin-top:34px;font-size:.62rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#8a8a86;display:flex;align-items:center;gap:10px}
+.hero-hint .hh-dot{width:8px;height:8px;border-radius:50%;background:var(--rouge);box-shadow:0 0 0 0 rgba(193,18,31,.4);animation:hintPulse 2.2s infinite}
+@keyframes hintPulse{0%{box-shadow:0 0 0 0 rgba(193,18,31,.45)}70%{box-shadow:0 0 0 9px rgba(193,18,31,0)}100%{box-shadow:0 0 0 0 rgba(193,18,31,0)}}
+body.night .hero-hint{color:#7d8694}
+@media (hover:none){.hero-hint{display:none}}
 .hero p .jp{color:var(--rouge);font-family:var(--display);font-weight:700;margin:0 .15em}
 .hero-actions{justify-content:center}
 .hero-actions{margin-top:40px;display:flex;gap:18px;flex-wrap:wrap}
@@ -372,12 +377,13 @@ body.night .scroll-hint{color:#8a92a0}
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="hero-center">
     <div class="eyebrow reveal">Cabinet d’architecture — New York City</div>
-    <h1 class="reveal d1">Nous dessinons<br>la <span class="accent">skyline</span> de demain.</h1>
-    <p class="reveal d2">Gratte-ciels, logements et lieux publics — de Manhattan à Brooklyn, depuis 2008.</p>
+    <h1 class="reveal d1">Façonner la <span class="accent">skyline</span><br>de New York.</h1>
+    <p class="reveal d2">Gratte-ciels, logements d’exception et lieux publics — depuis 2008.</p>
     <div class="hero-actions reveal d3">
       <a class="btn" href="#projets">Voir les projets <span class="arrow">→</span></a>
       <a class="btn ghost" href="#volume">Suivre un chantier</a>
     </div>
+    <div class="hero-hint reveal d3" aria-hidden="true"><span class="hh-dot"></span>Déplacez le pointeur — le projecteur éclaire la maquette</div>
   </div>
   <div class="scroll-hint"><span class="line"></span> Défiler</div>
 </header>
@@ -2062,13 +2068,25 @@ function facadeTexture(o){
   t.anisotropy=4; return t;
 }
 // paires jour/nuit partagees (performance) — varietes de facades
+// etch : grille de facade gravee tres discrete (style maquette d'archi blanche)
+function etchTexture(tone){
+  const c=document.createElement('canvas'); c.width=96; c.height=192;
+  const x=c.getContext('2d');
+  x.fillStyle=tone; x.fillRect(0,0,96,192);
+  x.strokeStyle='rgba(20,20,24,.07)'; x.lineWidth=1;
+  for(let i=1;i<6;i++){x.beginPath();x.moveTo(i*16,0);x.lineTo(i*16,192);x.stroke();}
+  for(let j=1;j<16;j++){x.beginPath();x.moveTo(0,j*12);x.lineTo(96,j*12);x.stroke();}
+  x.fillStyle='rgba(255,255,255,.05)';
+  for(let i=0;i<6;i++)for(let j=0;j<16;j++){if(Math.random()<.3)x.fillRect(i*16+2,j*12+2,12,8);}
+  const t=new THREE.CanvasTexture(c); t.anisotropy=4; return t;
+}
 let FAC=null;
 function facadePool(){
   if(FAC) return FAC;
   FAC=[];
-  const variants=[{base:'#D8D5CE',glass:'#9FB6C4'},{base:'#CFC9BE',glass:'#8FA8B8'},{base:'#DDDAD4',glass:'#AABDC9'},{base:'#C9CCCE',glass:'#97ACBA'},{base:'#E2DFD8',glass:'#A8BAC4'}];
+  const variants=[{base:'#D8D5CE',glass:'#9FB6C4',etch:'#F2F1EC'},{base:'#CFC9BE',glass:'#8FA8B8',etch:'#EBEAE4'},{base:'#DDDAD4',glass:'#AABDC9',etch:'#F6F5F0'},{base:'#C9CCCE',glass:'#97ACBA',etch:'#E6E7E3'},{base:'#E2DFD8',glass:'#A8BAC4',etch:'#EFEEEA'}];
   variants.forEach(v=>{
-    FAC.push({day:facadeTexture(v), night:facadeTexture({night:true,lit:.38})});
+    FAC.push({day:facadeTexture(v), night:facadeTexture({night:true,lit:.38}), etch:etchTexture(v.etch)});
   });
   return FAC;
 }
@@ -2203,19 +2221,28 @@ const viewer=(function(){
   const POOL=facadePool();
   const TONE=[0xF3F2ED,0xEAE9E3,0xE0DFD9,0xF7F6F1,0xE5E6E2,0xDAD9D3];
   const REDC=0xC1121F;
-  // facade epuree (volume blanc/gris) ; la nuit, les fenetres s'allument (emissif)
+  // facade epuree gravee (grille discrete) ; la nuit, les fenetres s'allument (emissif)
   function cleanFacade(){
     const tone=TONE[(Math.random()*TONE.length)|0];
     const pair=POOL[(Math.random()*POOL.length)|0];
     let m;
-    if(LIT) m=new THREE.MeshStandardMaterial({color:tone,metalness:.03,roughness:.94,envMap:ENV,envMapIntensity:.22});
+    if(LIT) m=new THREE.MeshStandardMaterial({color:tone,map:pair.etch||null,metalness:.03,roughness:.94,envMap:ENV,envMapIntensity:.22});
     else m=new THREE.MeshBasicMaterial({color:tone});
     cityMats.push({mat:m,pair,base:tone});
     return m;
   }
-  // batiment construit par l'agence : rouge
+  // batiment construit par l'agence : rouge, lignes d'etages gravees
+  let STRIPE=null;
+  function stripeTexture(){
+    if(STRIPE) return STRIPE;
+    const c=document.createElement('canvas'); c.width=32; c.height=256;
+    const x=c.getContext('2d'); x.fillStyle='#ffffff'; x.fillRect(0,0,32,256);
+    x.fillStyle='rgba(0,0,0,.16)';
+    for(let j=0;j<16;j++) x.fillRect(0,j*16,32,2);
+    STRIPE=new THREE.CanvasTexture(c); STRIPE.anisotropy=4; return STRIPE;
+  }
   function redCompany(){
-    if(LIT) return new THREE.MeshStandardMaterial({color:REDC,metalness:.18,roughness:.46,envMap:ENV,envMapIntensity:.5});
+    if(LIT) return new THREE.MeshStandardMaterial({color:REDC,map:stripeTexture(),metalness:.18,roughness:.46,envMap:ENV,envMapIntensity:.5});
     return new THREE.MeshBasicMaterial({color:REDC});
   }
   function redMesh(){return redCompany();}
@@ -2504,36 +2531,71 @@ document.addEventListener('keydown',e=>{
   if(!canvas||!window.THREE)return;
   const renderer=createRenderer(canvas);
   if(!renderer) return;
+  const LITE=window.__svgFallback;                  // repli sans WebGL : version plate allegee
   const scene=new THREE.Scene();
-  scene.fog=new THREE.Fog(0xFFFFFF,34,92);
+  scene.fog=new THREE.Fog(0xFFFFFF,30,84);
   const camera=new THREE.PerspectiveCamera(44,1,.1,260);
-  const softMat=new THREE.MeshBasicMaterial({color:0xECECEA});
-  const redMat=new THREE.MeshBasicMaterial({color:ROUGE});
-  const edgeMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.5});
-  const edgeFaint=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.3});
+
+  if(!LITE){
+    renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    if('outputEncoding' in renderer) renderer.outputEncoding=THREE.sRGBEncoding;
+    renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+  }
+
+  /* --- matériaux : maquette blanche gravée (jour) / fenêtres émissives (nuit) --- */
+  const POOLH=LITE?null:facadePool();
+  const mkBuildingMat=()=>{
+    if(LITE) return new THREE.MeshBasicMaterial({color:0xECECEA});
+    const p=POOLH[(Math.random()*POOLH.length)|0];
+    const m=new THREE.MeshLambertMaterial({color:0xF0EFEA,map:p.etch||null});
+    m.userData.pair=p; return m;
+  };
+  const bldMats=[]; for(let i=0;i<6;i++) bldMats.push(mkBuildingMat());
+  const redMat=LITE?new THREE.MeshBasicMaterial({color:ROUGE}):new THREE.MeshLambertMaterial({color:0xC1121F});
+  const edgeMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.42});
+  const edgeFaint=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.22});
   const redEdge=new THREE.LineBasicMaterial({color:ROUGE_VIF});
-  // suit le mode jour/nuit : la maquette du hero devient une skyline nocturne
-  window.__nightCbs.push(function(v){
-    softMat.color.setHex(v?0x202733:0xECECEA);
-    edgeMat.color.setHex(v?0x6f7b8c:INK); edgeFaint.color.setHex(v?0x4a5563:INK);
-  });
+  const groundMat=LITE?new THREE.MeshBasicMaterial({color:0xF2F1EC}):new THREE.MeshLambertMaterial({color:0xF2F1EC});
+
+  /* --- éclairage de base discret + PROJECTEUR qui suit le pointeur --- */
+  let spot=null, cone=null, halo=null;
+  const hemi=new THREE.HemisphereLight(0xf4f7ff,0xb9b4a8,LITE?0:.62); scene.add(hemi);
+  const base=new THREE.DirectionalLight(0xffffff,LITE?0:.34); base.position.set(-14,26,-10); scene.add(base);
+  if(!LITE){
+    spot=new THREE.SpotLight(0xfff0d2,1.85,90,.37,.65,1);
+    spot.position.set(6,24,8); spot.castShadow=true;
+    spot.shadow.mapSize.set(1024,1024); spot.shadow.bias=-0.0004; spot.shadow.normalBias=.02;
+    scene.add(spot); scene.add(spot.target);
+    // cône de lumière visible (discret le jour, marqué la nuit)
+    const cg=new THREE.ConeGeometry(1,1,28,1,true); cg.translate(0,-.5,0);
+    cone=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0xfff3d6,transparent:true,opacity:.055,depthWrite:false,side:THREE.DoubleSide}));
+    scene.add(cone);
+    // halo au sol (texture radiale)
+    const hc=document.createElement('canvas'); hc.width=hc.height=128;
+    const hx=hc.getContext('2d'); const grd=hx.createRadialGradient(64,64,4,64,64,62);
+    grd.addColorStop(0,'rgba(255,238,190,.9)'); grd.addColorStop(.45,'rgba(255,238,190,.32)'); grd.addColorStop(1,'rgba(255,238,190,0)');
+    hx.fillStyle=grd; hx.fillRect(0,0,128,128);
+    halo=new THREE.Mesh(new THREE.CircleGeometry(1,40),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(hc),transparent:true,opacity:.34,depthWrite:false}));
+    halo.rotation.x=-Math.PI/2; halo.scale.setScalar(4.6); scene.add(halo);
+  }
+
+  /* --- la ville : grille Manhattan, gratte-ciels à retraits, Central Park --- */
   function addBox(grp,w,h,d,y,red,faint){
     const geo=new THREE.BoxGeometry(w,h,d); geo.translate(0,h/2+y,0);
-    grp.add(new THREE.Mesh(geo,red?redMat:softMat));
+    const mesh=new THREE.Mesh(geo,red?redMat:bldMats[(Math.random()*bldMats.length)|0]);
+    if(!LITE){mesh.castShadow=true;mesh.receiveShadow=true;}
+    grp.add(mesh);
     grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),red?redEdge:(faint?edgeFaint:edgeMat)));
   }
-  const LITE=window.__svgFallback;   // mode sans WebGL : on allège la maquette
-  // Manhattan-style setback building (stacked, shrinking) + spire for talls
   function building(gx,gz,h,w,red){
     const grp=new THREE.Group();
     const seg=LITE?1:(h>6?3:(h>3?2:1)); let y=0;
     for(let i=0;i<seg;i++){const sh=h/seg, cw=w*(1-i*0.16); addBox(grp,cw,sh,cw,y,(red&&i===seg-1),h<2.4); y+=sh;}
-    if(!LITE&&h>7){const geo=new THREE.ConeGeometry(.07,h*.18,4); geo.translate(0,h,0); grp.add(new THREE.Mesh(geo,red?redMat:softMat));}
+    if(!LITE&&h>7){const geo=new THREE.ConeGeometry(.07,h*.18,4); geo.translate(0,h,0); grp.add(new THREE.Mesh(geo,red?redMat:bldMats[0]));}
     grp.position.set(gx,0,gz); grp.scale.y=.001; return grp;
   }
   const buildings=[];
   const N=LITE?11:15, SP=2.05, C=(N-1)/2, maxd=Math.hypot(C,C);
-  // Central Park : the void
   const inPark=(gx,gz)=>(gx>=2&&gx<=4&&gz>=-5&&gz<=4);
   for(let xi=0;xi<N;xi++)for(let zi=0;zi<N;zi++){
     const gx=(xi-C), gz=(zi-C);
@@ -2547,37 +2609,107 @@ document.addEventListener('keydown',e=>{
     b.userData.delay=(xi+zi)*38+Math.random()*240;
     scene.add(b); buildings.push(b);
   }
-  // Central Park plate + trees (the void)
-  const parkMesh=new THREE.Mesh(new THREE.BoxGeometry(2.6*SP,.04,9.4*SP),new THREE.MeshBasicMaterial({color:0xF1F1EE}));
-  parkMesh.position.set(3*SP,.02,-0.5*SP); scene.add(parkMesh);
+  // sol "table de maquette" : reçoit le faisceau et les ombres
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(120,120),groundMat);
+  ground.rotation.x=-Math.PI/2; ground.position.y=-0.04;
+  if(!LITE) ground.receiveShadow=true;
+  scene.add(ground);
+  // Central Park (le vide) + arbres
+  const parkMat=LITE?new THREE.MeshBasicMaterial({color:0xE7EAE0}):new THREE.MeshLambertMaterial({color:0xE7EAE0});
+  const parkMesh=new THREE.Mesh(new THREE.BoxGeometry(2.6*SP,.04,9.4*SP),parkMat);
+  parkMesh.position.set(3*SP,.02,-0.5*SP); if(!LITE)parkMesh.receiveShadow=true; scene.add(parkMesh);
   const parkEdge=new THREE.LineSegments(new THREE.EdgesGeometry(parkMesh.geometry),edgeFaint);
   parkEdge.position.copy(parkMesh.position); scene.add(parkEdge);
+  const treeMat=LITE?new THREE.MeshBasicMaterial({color:0x9DB48F}):new THREE.MeshLambertMaterial({color:0x9DB48F});
   for(let i=0;i<10;i++){
     const t=new THREE.Group();
     const cr=new THREE.ConeGeometry(.5,1.1,6); cr.translate(0,1,0);
-    t.add(new THREE.Mesh(cr,softMat)); t.add(new THREE.LineSegments(new THREE.EdgesGeometry(cr),edgeFaint));
+    const m=new THREE.Mesh(cr,treeMat); if(!LITE){m.castShadow=true;} t.add(m);
+    t.add(new THREE.LineSegments(new THREE.EdgesGeometry(cr),edgeFaint));
     t.position.set(3*SP+(Math.random()-.5)*2.2,0,(-0.5+ (i-4.5)*0.9)*SP); scene.add(t);
   }
-  // dotted ground
+  // trame de croisillons
   const pts=[];
-  for(let x=0;x<=N;x++)for(let z=0;z<=N;z++){const cx=(x-C)*SP,cz=(z-C)*SP,s=.15;pts.push(cx-s,0,cz,cx+s,0,cz,cx,0,cz-s,cx,0,cz+s);}
+  for(let x=0;x<=N;x++)for(let z=0;z<=N;z++){const cx=(x-C)*SP,cz=(z-C)*SP,s=.15;pts.push(cx-s,.01,cz,cx+s,.01,cz,cx,.01,cz-s,cx,.01,cz+s);}
   const crossGeo=new THREE.BufferGeometry(); crossGeo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
-  scene.add(new THREE.LineSegments(crossGeo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.16})));
-  let mouseX=0, mouseY=0, tgX=0, tgY=0;
-  window.addEventListener('mousemove',e=>{tgX=(e.clientX/window.innerWidth-.5);tgY=(e.clientY/window.innerHeight-.5);},{passive:true});
+  scene.add(new THREE.LineSegments(crossGeo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.15})));
+
+  /* --- mode jour/nuit global --- */
+  let isNight=false;
+  window.__nightCbs.push(function(v){
+    isNight=v;
+    scene.fog.color.setHex(v?0x0C0F15:0xFFFFFF);
+    groundMat.color.setHex(v?0x10131a:0xF2F1EC);
+    parkMat.color.setHex(v?0x16201a:0xE7EAE0);
+    treeMat.color.setHex(v?0x24332a:0x9DB48F);
+    edgeMat.color.setHex(v?0x6f7b8c:INK); edgeFaint.color.setHex(v?0x4a5563:INK);
+    if(LITE){bldMats.forEach(m=>m.color.setHex(v?0x202733:0xECECEA));redMat.color.setHex(v?0x8f1822:ROUGE);return;}
+    bldMats.forEach(m=>{
+      const p=m.userData.pair;
+      m.color.setHex(v?0x12151c:0xF0EFEA);
+      m.map=v?null:(p.etch||null);
+      m.emissiveMap=v?p.night:null; m.emissive.setHex(v?0xc9a25e:0x000000); m.emissiveIntensity=v?.42:0;
+      m.needsUpdate=true;
+    });
+    redMat.emissive&&redMat.emissive.setHex(v?0x300508:0x000000);
+    hemi.intensity=v?.16:.62; base.intensity=v?.08:.34;
+    if(spot){spot.intensity=v?3.0:1.85; spot.color.setHex(v?0xffe7b0:0xfff0d2);}
+    if(cone)cone.material.opacity=v?.18:.055;
+    if(halo)halo.material.opacity=v?.5:.34;
+  });
+
+  /* --- PROJECTEUR : suit la souris / le doigt ; balayage auto en veille --- */
+  const ray=new THREE.Raycaster(), ndc=new THREE.Vector2(), plane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+  const spotT=new THREE.Vector3(0,0,0), spotGoal=new THREE.Vector3(0,0,0), hit=new THREE.Vector3();
+  let lastMove=-9999, mouseX=0, mouseY=0, tgX=0, tgY=0;
+  const heroEl=document.querySelector('.hero');
+  window.addEventListener('pointermove',e=>{
+    tgX=(e.clientX/window.innerWidth-.5); tgY=(e.clientY/window.innerHeight-.5);
+    const r=heroEl.getBoundingClientRect();
+    if(e.clientY>=r.top&&e.clientY<=r.bottom){
+      ndc.set((e.clientX-r.left)/r.width*2-1, -((e.clientY-r.top)/r.height*2-1));
+      ray.setFromCamera(ndc,camera);
+      if(ray.ray.intersectPlane(plane,hit)){
+        const L=Math.hypot(hit.x,hit.z), MAX=C*SP+1.5;
+        if(L>MAX){hit.x*=MAX/L;hit.z*=MAX/L;}
+        spotGoal.copy(hit); lastMove=performance.now();
+      }
+    }
+  },{passive:true});
+
   const t0=performance.now();
   function resize(){const el=renderer.domElement,w=el.parentElement.clientWidth,h=el.parentElement.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
   window.addEventListener('resize',resize);resize();
+
   function frame(t){
     const el=t-t0;
     buildings.forEach(b=>{const k=Math.max(0,Math.min(1,(el-b.userData.delay)/950));b.scale.y=.001+(1-Math.pow(1-k,3))*.999;});
-    // AUCUNE animation au scroll : la camera ne bouge qu'avec la souris (vue du dessus, agrandie)
-    mouseX+=(tgX-mouseX)*.06; mouseY+=(tgY-mouseY)*.06;
-    const angle=-.35+(reduceMotion?0:mouseX*.7);          // pivot gauche/droite a la souris
-    const elev=reduceMotion?.95:(.86 - mouseY*.32);        // vue plongeante (du dessus)
-    const radius=20.5;                                     // agrandie
+
+    // veille (ou mobile sans pointeur) : le projecteur balaie lentement la maquette
+    if(t-lastMove>2600&&!reduceMotion){
+      spotGoal.set(Math.sin(t*.00021)*8.5, 0, Math.cos(t*.00016)*8.5);
+    }
+    spotT.lerp(spotGoal,.07);                            // inertie douce du faisceau
+    if(spot){
+      spot.target.position.copy(spotT);
+      spot.position.set(spotT.x+5.5,23,spotT.z+7);
+      const dir=new THREE.Vector3().subVectors(spotT,spot.position);
+      const len=dir.length();
+      cone.position.copy(spot.position);
+      cone.scale.set(Math.tan(.37)*len*.92,len,Math.tan(.37)*len*.92);
+      cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,-1,0),dir.normalize());
+      halo.position.set(spotT.x,.06,spotT.z);
+      const puls=1+Math.sin(t*.0018)*.05;
+      halo.scale.setScalar(4.6*puls);
+    }
+
+    // caméra : vue plongeante, pivot subtil à la souris (le projecteur reste l'acteur principal)
+    mouseX+=(tgX-mouseX)*.05; mouseY+=(tgY-mouseY)*.05;
+    const angle=-.35+(reduceMotion?0:mouseX*.22);
+    const elev=reduceMotion?.95:(.88 - mouseY*.10);
+    const radius=20.5;
     camera.position.set(Math.sin(angle)*radius*Math.cos(elev), radius*Math.sin(elev), Math.cos(angle)*radius*Math.cos(elev));
-    camera.lookAt(0,1.6,0);
+    camera.lookAt(0,1.4,0);
     renderer.render(scene,camera);
     requestAnimationFrame(frame);
   }
@@ -2662,7 +2794,14 @@ document.addEventListener('keydown',e=>{
     corners.forEach(c=>{const m=new THREE.Mesh(colGeo,steelMat); m.position.set(c[0]*hw,BO+(i+.5)*FH,c[1]*hw); cg.add(m);});
     cg.visible=false; scene.add(cg); cols.push(cg);
     const pg=new THREE.BoxGeometry(hw*2*.985,FH*.99,hw*2*.985);
-    const pn=new THREE.Mesh(pg,mirror); pn.position.y=BO+(i+.5)*FH; pn.rotation.y=L.rot; pn.visible=false; scene.add(pn); pans.push(pn);
+    const pwrap=new THREE.Group(); pwrap.rotation.y=L.rot; pwrap.position.y=BO+(i+.5)*FH;
+    pwrap.add(new THREE.Mesh(pg,mirror));
+    // meneaux verticaux : un montant au centre de chaque face (verticalite premium)
+    const mpts=[]; const e=hw*.99;
+    mpts.push(0,-FH*.49,e, 0,FH*.49,e, 0,-FH*.49,-e, 0,FH*.49,-e, e,-FH*.49,0, e,FH*.49,0, -e,-FH*.49,0, -e,FH*.49,0);
+    const mg=new THREE.BufferGeometry(); mg.setAttribute('position',new THREE.Float32BufferAttribute(mpts,3));
+    pwrap.add(new THREE.LineSegments(mg,greyLine));
+    pwrap.visible=false; scene.add(pwrap); pans.push(pwrap);
   }
 
   // 6) COURONNEMENT : parapet + longue fleche (One WTC)
@@ -2672,6 +2811,9 @@ document.addEventListener('keydown',e=>{
   crown.add(new THREE.Mesh(para,whiteMat)); crown.add(E(para,redLine));
   const mast=new THREE.CylinderGeometry(.03,.14,5.4,8); mast.translate(0,FH*1.2+2.7,0); crown.add(new THREE.Mesh(mast,steelMat));
   const tip=new THREE.CylinderGeometry(0,.06,1.1,6); tip.translate(0,FH*1.2+5.8,0); crown.add(new THREE.Mesh(tip,redMat));
+  // balise aeronautique rouge clignotante au sommet de la fleche
+  const beacon=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),new THREE.MeshBasicMaterial({color:0xFF2D3C,transparent:true}));
+  beacon.position.y=FH*1.2+6.1; crown.add(beacon);
   crown.position.y=BO+H; crown.visible=false; scene.add(crown);
 
   // Statue de la Liberte (symbole)
@@ -2711,7 +2853,13 @@ document.addEventListener('keydown',e=>{
   const stepEls=[...document.querySelectorAll('.tour-steps li')];
   let lastPhase=-1, smoothP=0;
 
-  function resize(){const el=renderer.domElement,w=el.parentElement.clientWidth,h=el.parentElement.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  function resize(){
+    const el=renderer.domElement,w=el.parentElement.clientWidth,h=el.parentElement.clientHeight;
+    renderer.setSize(w,h,false);camera.aspect=w/h;
+    // sur desktop, la tour est decalee a droite du texte (composition equilibree)
+    if(camera.setViewOffset){ if(w>960) camera.setViewOffset(w,h,-w*.10,0,w,h); else camera.clearViewOffset(); }
+    camera.updateProjectionMatrix();
+  }
   window.addEventListener('resize',resize);resize();
 
   function frame(){
@@ -2719,6 +2867,7 @@ document.addEventListener('keydown',e=>{
     const total=rect.height-window.innerHeight;
     const raw=cl(-rect.top/total);
     smoothP+=(raw-smoothP)*.06; const p=smoothP;     // scroll plus fluide
+    beacon.material.opacity=.35+.65*Math.abs(Math.sin(performance.now()*.0024));
 
     const foundP=cl(p/.12); found.scale.setScalar(.6+.4*foundP); found.visible=foundP>.01;
     const coreP=cl((p-.10)/.20); core.scale.y=Math.max(.001,coreP); coreE.scale.y=core.scale.y;
