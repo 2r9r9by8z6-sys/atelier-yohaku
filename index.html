@@ -307,6 +307,35 @@ footer .jp{color:var(--rouge)}
   .pm-left,.pm-right{padding:34px 22px}
   .viewer{height:340px}
 }
+
+/* ====== BOUTON JOUR/NUIT ====== */
+.theme-toggle{width:42px;height:42px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer;font-size:1.05rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .3s,color .3s,transform .25s;margin-left:18px}
+.theme-toggle:hover{transform:translateY(-2px);background:var(--rouge);color:var(--paper);border-color:var(--ink)}
+@media (max-width:960px){.theme-toggle{margin-left:auto;margin-right:12px}}
+
+/* ====== THEME NUIT GLOBAL ====== */
+body.night{--paper:#0C0F15;--ink:#E9EAED;--gris:#191D25;--rouge-soft:#2A1417;background:#0C0F15;color:#D7DBE2}
+body.night nav{background:rgba(12,15,21,.9);border-bottom-color:#262B34}
+body.night .logo,body.night .nav-links a,body.night .mobile-menu a{color:#E9EAED}
+body.night .logo-sub{color:#7F8794}
+body.night .mobile-menu{background:#0C0F15;border-bottom-color:#262B34}
+body.night .mobile-menu a{border-bottom-color:#1d222b}
+body.night .ticker{background:#0C0F15;border-color:#262B34}
+body.night .hero p{color:#AEB6C2}
+body.night .hero-center h1,body.night .hero-center .eyebrow,body.night .hero-center p{text-shadow:0 2px 22px rgba(0,0,0,.8)}
+body.night .hero-veil{background:radial-gradient(95% 60% at 50% 40%, rgba(12,15,21,.5) 0%, rgba(12,15,21,.12) 42%, transparent 66%),linear-gradient(to bottom, rgba(12,15,21,.86) 0%, transparent 24%, transparent 80%, rgba(12,15,21,.5) 100%)}
+body.night .sec-sub,body.night .project .desc,body.night .step p,body.night .contact-info p,body.night .empty-msg,body.night .hero-card .meta{color:#A7AFBB}
+body.night .project,body.night .contact-card,body.night .hero-card,body.night .pmodal,body.night .pm-top{background:#12161E}
+body.night .project .thumb{border-bottom-color:#262B34}
+body.night .sec-num{background:#241012;border-color:#E9EAED}
+body.night .field input,body.night .field textarea{background:#191D25;color:#E9EAED;border-color:#39414d}
+body.night .field input::placeholder,body.night .field textarea::placeholder{color:#6b727d}
+body.night .project .foot,body.night .spec,body.night .legend button,body.night .atelier-grid,body.night .stat,body.night .specs,body.night .pm-left,body.night .pm-body,body.night .pm-hero{border-color:#2A2F39!important}
+body.night .tour3d{background:#05070C}
+body.night footer{border-top-color:#262B34}
+body.night .num{color:var(--rouge-vif)}
+body.night .stat:hover{background:#1a1014}
+body.night .scroll-hint{color:#8a92a0}
 </style>
 </head>
 <body>
@@ -326,6 +355,7 @@ footer .jp{color:var(--rouge)}
     <li><a href="#demarche">Process</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <button class="theme-toggle" id="themeToggle" aria-label="Jour / Nuit" title="Jour / Nuit"><span class="tt-ico">☼</span></button>
   <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
 </nav>
 <ul class="mobile-menu" id="mobileMenu">
@@ -1979,6 +2009,8 @@ footer .jp{color:var(--rouge)}
 </script>
 <script>
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+window.__nightCbs=[];
+window.setNight=function(v){document.body.classList.toggle('night',v);window.__nightCbs.forEach(f=>{try{f(v);}catch(e){}});};
 const INK=0x0E0E0E, ROUGE=0x7A0E14, ROUGE_VIF=0x9E1620;
 
 /* Crée un rendu WebGL ; si WebGL est indisponible (accélération graphique
@@ -2114,37 +2146,83 @@ const viewer=(function(){
   const renderer=createRenderer(canvas);
   if(!renderer) return null;
   const scene=new THREE.Scene();
-  scene.fog=new THREE.Fog(0xFFFFFF,34,82); // brume blanche : profondeur sur fond papier
+  scene.fog=new THREE.Fog(0xFFFFFF,40,95);
   const camera=new THREE.PerspectiveCamera(38,1,.1,300);
   let model=null, rotY=.6, rotX=.35, targetRotY=.6, targetRotX=.35, dist=26, lookY=2.4, auto=true, raf=null, dragging=false, lx=0, ly=0;
 
-  const inkLine=()=>new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.55});
+  // WebGL = rendu eclaire + ombres ; SVG = repli plat
+  const LIT = !window.__svgFallback && !!renderer.shadowMap;
+  if(LIT){
+    renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    if('outputEncoding' in renderer) renderer.outputEncoding=THREE.sRGBEncoding;
+    renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.04;
+  }
+
+  // ciel cube (reflets du verre) jour + nuit
+  function makeEnv(nm){
+    const f=[];
+    for(let i=0;i<6;i++){
+      const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d');
+      if(i===2){ x.fillStyle=nm?'#26303f':'#eef4f8'; x.fillRect(0,0,64,64); }      // haut (ciel)
+      else if(i===3){ x.fillStyle=nm?'#05070b':'#9ba7b3'; x.fillRect(0,0,64,64); }  // bas (sol)
+      else { const g=x.createLinearGradient(0,0,0,64); if(nm){g.addColorStop(0,'#1b2434');g.addColorStop(1,'#070a11');} else {g.addColorStop(0,'#dde9f2');g.addColorStop(1,'#b6c4d2');} x.fillStyle=g; x.fillRect(0,0,64,64); }
+      f.push(c);
+    }
+    const t=new THREE.CubeTexture(f); t.needsUpdate=true; return t;
+  }
+  const ENV=makeEnv(false), ENVN=makeEnv(true);
+  if(LIT) scene.environment=ENV;
+
+  // lumieres : soleil + ciel
+  const hemi=new THREE.HemisphereLight(0xeaf2ff,0x8a8576,LIT?.78:0); scene.add(hemi);
+  const sun=new THREE.DirectionalLight(0xfff1dd,LIT?1.2:0); sun.position.set(20,34,16);
+  if(LIT){ sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+    const d=34, cam=sun.shadow.camera; cam.left=-d;cam.right=d;cam.top=d;cam.bottom=-d;cam.near=1;cam.far=130; sun.shadow.bias=-0.0006; sun.shadow.normalBias=.02; }
+  scene.add(sun); scene.add(sun.target);
+  const fill=new THREE.DirectionalLight(0xbcd2e6,LIT?.28:0); fill.position.set(-16,12,-10); scene.add(fill);
+
+  const inkLine=()=>new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.5});
   const redLine=()=>new THREE.LineBasicMaterial({color:ROUGE_VIF});
-  const inkFill=()=>new THREE.MeshBasicMaterial({color:INK});
-  const steelFill=()=>new THREE.MeshBasicMaterial({color:0x2A2A2C});
-  const softFill=()=>new THREE.MeshBasicMaterial({color:0xF4F4F2});
-  const whiteFill=()=>new THREE.MeshBasicMaterial({color:0xffffff});
-  const redMesh=()=>new THREE.MeshBasicMaterial({color:ROUGE});
-  const glassFill=()=>new THREE.MeshBasicMaterial({color:0xBFD2DE,transparent:true,opacity:.5});
-  const glassBlue=()=>new THREE.MeshBasicMaterial({color:0x9DB6C6,transparent:true,opacity:.72});
+  const matFill=(c)=> LIT? new THREE.MeshLambertMaterial({color:c}) : new THREE.MeshBasicMaterial({color:c});
+  const inkFill=()=>matFill(INK);
+  const steelFill=()=> LIT? new THREE.MeshStandardMaterial({color:0x3A3E45,metalness:.85,roughness:.42,envMap:ENV,envMapIntensity:.7}) : new THREE.MeshBasicMaterial({color:0x2A2A2C});
+  const softFill=()=>matFill(0xEDEDE8);
+  const whiteFill=()=>matFill(0xffffff);
+  const redMesh=()=>matFill(ROUGE);
+  let glassList=[];
+  function glassMat(tint){
+    if(!LIT) return new THREE.MeshBasicMaterial({color:0xBFD2DE,transparent:true,opacity:.5});
+    const m=new THREE.MeshStandardMaterial({color:tint||0x2A3942,metalness:.92,roughness:.07,envMap:ENV,envMapIntensity:1.15,transparent:true,opacity:.82});
+    glassList.push(m); return m;
+  }
+  const glassFill=()=>glassMat(0x2A3942);
+  const glassBlue=()=>glassMat(0x223645);
   function edges(geo,mat){return new THREE.LineSegments(new THREE.EdgesGeometry(geo),mat)}
 
-  // --- realism: textured facades + night mode registries (reset each show) ---
+  // --- facades texturees + mode nuit (registres remis a zero a chaque show) ---
   let night=false; let facadeMeshes=[]; let flatNight=[];
   const POOL=facadePool();
   function facadeMats(){
     const pair=POOL[(Math.random()*POOL.length)|0];
-    const side=new THREE.MeshBasicMaterial({map:night?pair.night:pair.day});
-    const top=new THREE.MeshBasicMaterial({color:0x6B6B6E});
-    const bot=new THREE.MeshBasicMaterial({color:0x202024});
+    let side;
+    if(LIT){ side=new THREE.MeshLambertMaterial({map:night?pair.night:pair.day, emissive:0xfff0d0, emissiveMap:night?pair.night:null, emissiveIntensity:night?.9:0}); }
+    else { side=new THREE.MeshBasicMaterial({map:night?pair.night:pair.day}); }
+    const top=matFill(0x6B6B6E); const bot=matFill(0x202024);
     facadeMeshes.push({side,pair});
     return [side,side,top,bot,side,side];
   }
   function registerFlat(mat,day,nightC){flatNight.push({mat,day,nightC});mat.color.setHex(night?nightC:day);return mat;}
   function applyNight(v){
     night=v;
-    facadeMeshes.forEach(o=>{o.side.map=night?o.pair.night:o.pair.day;o.side.needsUpdate=true;});
+    facadeMeshes.forEach(o=>{o.side.map=night?o.pair.night:o.pair.day; if(LIT){o.side.emissiveMap=night?o.pair.night:null;o.side.emissiveIntensity=night?.9:0;} o.side.needsUpdate=true;});
     flatNight.forEach(o=>o.mat.color.setHex(night?o.nightC:o.day));
+    if(LIT){
+      glassList.forEach(m=>{m.envMap=night?ENVN:ENV;m.envMapIntensity=night?.7:1.15;m.color.setHex(night?0x10171e:0x2A3942);m.needsUpdate=true;});
+      scene.environment=night?ENVN:ENV;
+      hemi.intensity=night?.22:.78; hemi.color.setHex(night?0x2a3550:0xeaf2ff);
+      sun.intensity=night?.18:1.2; sun.color.setHex(night?0x9fb2d6:0xfff1dd);
+      fill.intensity=night?.1:.28;
+    }
     scene.fog.color.setHex(night?0x0B0E14:0xFFFFFF);
     box.classList.toggle('night',night);
   }
@@ -2197,16 +2275,16 @@ const viewer=(function(){
   function tree(x,z,s){
     s=s||1; const g=new THREE.Group();
     const tr=new THREE.CylinderGeometry(.06,.09,.9*s,5); tr.translate(0,.45*s,0);
-    g.add(new THREE.Mesh(tr,new THREE.MeshBasicMaterial({color:0x5A4632})));
+    g.add(new THREE.Mesh(tr,matFill(0x5A4632)));
     const cr=new THREE.ConeGeometry(.6*s,1.4*s,7); cr.translate(0,1.35*s,0);
-    g.add(new THREE.Mesh(cr,registerFlat(new THREE.MeshBasicMaterial({color:0x6E8B5A}),0x6E8B5A,0x2C3A28)));
+    g.add(new THREE.Mesh(cr,registerFlat(matFill(0x6E8B5A),0x6E8B5A,0x2C3A28)));
     g.position.set(x,0,z); return g;
   }
   // realistic ground: concrete plane + faint street grid
   function ground(g,n){
     n=n||14; const S=n*1.25;
-    const plane=new THREE.Mesh(new THREE.PlaneGeometry(S*2,S*2),registerFlat(new THREE.MeshBasicMaterial({color:0xC4C4BF}),0xC4C4BF,0x14161C));
-    plane.rotation.x=-Math.PI/2; plane.position.y=-0.03; g.add(plane);
+    const plane=new THREE.Mesh(new THREE.PlaneGeometry(S*2,S*2),registerFlat(matFill(0xC4C4BF),0xC4C4BF,0x14161C));
+    plane.rotation.x=-Math.PI/2; plane.position.y=-0.03; plane.userData.ground=true; plane.receiveShadow=true; g.add(plane);
     const pts=[];
     for(let x=-n;x<=n;x+=2){pts.push(x,0,-n,x,0,n);} for(let z=-n;z<=n;z+=2){pts.push(-n,0,z,n,0,z);}
     const geo=new THREE.BufferGeometry(); geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
@@ -2329,16 +2407,22 @@ const viewer=(function(){
 
   document.getElementById('vAuto').addEventListener('click',function(){auto=!auto;this.classList.toggle('on',auto);});
   document.getElementById('vReset').addEventListener('click',()=>{targetRotY=.6;targetRotX=.35;});
-  document.getElementById('vNight').addEventListener('click',function(){applyNight(!night);this.classList.toggle('on',night);this.textContent=night?'Jour':'Nuit';});
+  document.getElementById('vNight').addEventListener('click',function(){window.setNight(!document.body.classList.contains('night'));});
+  // suit le mode jour/nuit global
+  window.__nightCbs.push(function(v){
+    applyNight(v);
+    const btn=document.getElementById('vNight'); if(btn){btn.classList.toggle('on',v);btn.textContent=v?'Jour':'Nuit';}
+  });
 
   return {
     show(type){
       if(model){scene.remove(model);model.traverse(o=>{o.geometry&&o.geometry.dispose();o.material&&(Array.isArray(o.material)?o.material.forEach(m=>m.dispose&&m.dispose()):o.material.dispose&&o.material.dispose());});}
-      facadeMeshes=[]; flatNight=[];
+      facadeMeshes=[]; flatNight=[]; glassList=[];
       model=new THREE.Group();
       dist=26; lookY=2.4;
       (builders[type]||builders.tower)(model);
       scene.add(model);
+      if(LIT) model.traverse(o=>{if(o.isMesh){o.castShadow=!o.userData.ground;o.receiveShadow=true;}});
       applyNight(night);          // garde l'état jour/nuit choisi
       targetRotY=.6;targetRotX=.35;rotY=.6;rotX=.35;
       resize();
@@ -2414,6 +2498,11 @@ document.addEventListener('keydown',e=>{
   const edgeMat=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.5});
   const edgeFaint=new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.3});
   const redEdge=new THREE.LineBasicMaterial({color:ROUGE_VIF});
+  // suit le mode jour/nuit : la maquette du hero devient une skyline nocturne
+  window.__nightCbs.push(function(v){
+    softMat.color.setHex(v?0x202733:0xECECEA);
+    edgeMat.color.setHex(v?0x6f7b8c:INK); edgeFaint.color.setHex(v?0x4a5563:INK);
+  });
   function addBox(grp,w,h,d,y,red,faint){
     const geo=new THREE.BoxGeometry(w,h,d); geo.translate(0,h/2+y,0);
     grp.add(new THREE.Mesh(geo,red?redMat:softMat));
@@ -2701,6 +2790,14 @@ document.getElementById('sendBtn').addEventListener('click',()=>{
   toast.classList.add('show');nom.value=email.value=msg.value='';
   setTimeout(()=>toast.classList.remove('show'),4000);
 });
+
+/* ====== Bouton Jour/Nuit global ====== */
+(function(){
+  const btn=document.getElementById('themeToggle'); if(!btn)return;
+  const ico=btn.querySelector('.tt-ico');
+  let on=false;
+  btn.addEventListener('click',()=>{on=!on;window.setNight(on);ico.textContent=on?'☾':'☼';btn.setAttribute('aria-pressed',on);});
+})();
 
 /* ====== Loader ====== */
 (function(){
