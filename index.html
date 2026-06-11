@@ -6,7 +6,7 @@
 <title>Atelier Yohaku — Architecture &amp; Urbanisme</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#FFFFFF;
@@ -15,8 +15,8 @@
   --rouge-vif:#9E1620;
   --rouge-soft:#F4E5E4;
   --gris:#EDEDEB;
-  --display:'Shippori Mincho',serif;
-  --body:'Zen Kaku Gothic New',sans-serif;
+  --display:'Archivo',sans-serif;
+  --body:'Inter',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -26,16 +26,36 @@ body.modal-open{overflow:hidden}
 
 .dots{background-image:radial-gradient(var(--ink) 1px, transparent 1.4px);background-size:9px 9px}
 
+/* ====== LOADER ====== */
+#loader{position:fixed;inset:0;z-index:200;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:transform .7s cubic-bezier(.7,0,.2,1)}
+#loader.done{transform:translateY(-101%)}
+#loader .l-logo{font-family:var(--display);font-weight:900;font-size:clamp(2rem,6vw,3.6rem);letter-spacing:.04em;color:var(--paper);text-transform:uppercase}
+#loader .l-logo .plus{color:var(--rouge-vif)}
+#loader .l-sub{font-size:.62rem;letter-spacing:.5em;text-transform:uppercase;color:#777}
+#loader .l-bar{width:160px;height:2px;background:#333;overflow:hidden}
+#loader .l-bar::after{content:'';display:block;width:40%;height:100%;background:var(--rouge-vif);animation:lbar 1s infinite cubic-bezier(.4,0,.6,1)}
+@keyframes lbar{from{transform:translateX(-100%)}to{transform:translateX(350%)}}
+
+/* ====== TICKER ====== */
+.ticker{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);background:var(--paper);overflow:hidden;white-space:nowrap;position:relative;z-index:3}
+.ticker-track{display:inline-block;animation:tick 30s linear infinite;padding:13px 0}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-track span{font-family:var(--display);font-weight:800;font-size:.78rem;letter-spacing:.3em;text-transform:uppercase}
+.ticker-track .sep{color:var(--rouge);margin:0 22px;font-style:normal}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
 /* ====== RAIL ====== */
 .rail{position:fixed;top:0;right:46px;width:14px;height:100vh;z-index:30;pointer-events:none}
 .rail::before{content:'';position:absolute;inset:0 5px;background:repeating-linear-gradient(to bottom, var(--ink) 0 10px, transparent 10px 18px);opacity:.22}
-.rail-fill{position:absolute;top:0;left:0;width:100%;height:0%;background:repeating-linear-gradient(135deg, var(--rouge) 0 6px, var(--ink) 6px 8px)}
+.rail-fill{position:absolute;top:0;left:0;width:100%;height:0%;background:var(--rouge)}
 .rail-marker{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);width:30px;height:30px;background:var(--rouge);border:2px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:var(--paper)}
 
 /* ====== NAV ====== */
-nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:space-between;align-items:center;padding:18px 90px 18px 48px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1.5px dashed var(--ink)}
+nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:space-between;align-items:center;padding:18px 90px 18px 48px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--ink);transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+nav.hide{transform:translateY(-102%)}
 .logo{font-family:var(--display);font-weight:800;font-size:1.2rem;letter-spacing:.05em;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
 .logo .plus{color:var(--rouge);font-size:1.5rem;font-weight:800}
+.logo-sub{font-family:var(--body);font-size:.6rem;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#888;margin-left:4px;transform:translateY(2px)}
 .nav-links{display:flex;gap:32px;list-style:none}
 .nav-links a{text-decoration:none;color:var(--ink);font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;position:relative;padding-bottom:3px}
 .nav-links a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--rouge);transition:width .3s}
@@ -48,7 +68,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:
 .burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 .mobile-menu{display:none;position:fixed;top:79px;left:0;right:0;z-index:55;background:var(--paper);border-bottom:2px solid var(--ink);flex-direction:column;list-style:none;transform:translateY(-110%);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
 .mobile-menu.open{transform:translateY(0)}
-.mobile-menu a{display:block;padding:18px 24px;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border-bottom:1.5px dashed var(--ink)}
+.mobile-menu a{display:block;padding:18px 24px;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid var(--ink)}
 .mobile-menu a .jp{color:var(--rouge);margin-right:10px}
 
 /* ====== HERO ====== */
@@ -63,7 +83,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:
 .eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;display:flex;align-items:center;gap:14px;margin-bottom:26px}
 .eyebrow::before{content:'';width:48px;height:2px;background:var(--rouge)}
 .eyebrow .jp{color:var(--rouge);letter-spacing:.1em}
-h1{font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,5.6vw,4.9rem);line-height:1.12;letter-spacing:.01em}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(2.4rem,5.4vw,4.7rem);line-height:1.02;letter-spacing:-.01em;text-transform:uppercase}
 h1 .accent{position:relative;white-space:nowrap;color:var(--paper)}
 h1 .accent::after{content:'';position:absolute;left:-3px;right:-3px;top:.14em;bottom:.14em;background:var(--ink);z-index:-1;transform-origin:left;animation:paint 1s .5s cubic-bezier(.7,0,.2,1) backwards}
 @keyframes paint{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -85,17 +105,18 @@ h1 .accent::after{content:'';position:absolute;left:-3px;right:-3px;top:.14em;bo
 .hero-card h3{font-family:var(--display);font-size:1.1rem;margin-bottom:6px}
 .hero-card .meta{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:#666}
 .photo{position:relative;overflow:hidden;border:1.5px solid var(--ink);margin-top:16px}
-.photo img{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.12);transition:transform .6s cubic-bezier(.2,.7,.2,1)}
-.photo::after{content:'';position:absolute;inset:0;background:var(--rouge);mix-blend-mode:multiply;opacity:0;transition:opacity .45s}
+.photo img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.92) contrast(1.04);transition:transform .6s cubic-bezier(.2,.7,.2,1),filter .5s}
+.photo::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(10,12,16,.42),transparent 55%);opacity:0;transition:opacity .45s}
 .photo:hover img{transform:scale(1.06)}
-.photo:hover::after{opacity:.45}
+.photo:hover::after{opacity:1}
+.photo:hover img{filter:saturate(1.05) contrast(1.06)}
 .photo .ph-label{position:absolute;bottom:0;left:0;background:var(--ink);color:var(--paper);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;padding:5px 10px;z-index:2}
 
 /* ====== SECTIONS ====== */
 section{padding:110px 110px 110px 48px;position:relative}
 .sec-head{display:flex;align-items:baseline;gap:22px;margin-bottom:14px;flex-wrap:wrap}
 .sec-num{font-size:.72rem;font-weight:700;letter-spacing:.25em;border:1.5px solid var(--ink);padding:6px 12px;background:var(--rouge-soft)}
-h2{font-family:var(--display);font-weight:800;font-size:clamp(1.9rem,3.6vw,3rem)}
+h2{font-family:var(--display);font-weight:900;font-size:clamp(1.9rem,3.6vw,3rem);text-transform:uppercase;letter-spacing:-.01em}
 h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter-spacing:.1em}
 .sec-sub{max-width:60ch;color:#444;margin-bottom:54px}
 
@@ -118,10 +139,11 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 .project.filtered-out{display:none}
 .project:hover{transform:translate(-4px,-4px);box-shadow:7px 7px 0 var(--rouge)}
 .project .thumb{height:210px;border-bottom:2px solid var(--ink);position:relative;overflow:hidden}
-.project .thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) contrast(1.15);transition:transform .7s cubic-bezier(.2,.7,.2,1)}
-.project .thumb::after{content:'';position:absolute;inset:0;background:var(--rouge);mix-blend-mode:multiply;opacity:0;transition:opacity .45s}
+.project .thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.92) contrast(1.05);transition:transform .7s cubic-bezier(.2,.7,.2,1),filter .5s}
+.project .thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(10,12,16,.5),transparent 60%);opacity:0;transition:opacity .45s}
 .project:hover .thumb img{transform:scale(1.07)}
-.project:hover .thumb::after{opacity:.5}
+.project:hover .thumb::after{opacity:1}
+.project:hover .thumb img{filter:saturate(1.08)}
 .project .thumb .open-hint{position:absolute;top:12px;right:12px;z-index:3;background:var(--paper);border:1.5px solid var(--ink);font-size:.56rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:5px 10px;opacity:0;transform:translateY(-6px);transition:opacity .3s, transform .3s}
 .project:hover .thumb .open-hint{opacity:1;transform:none}
 .project .thumb.fallback{background-image:radial-gradient(var(--ink) 1px, transparent 1.4px);background-size:9px 9px}
@@ -129,7 +151,7 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 .project .cat{font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--paper);background:var(--rouge);border:1.5px solid var(--ink);display:inline-block;padding:3px 10px;margin-bottom:12px}
 .project h3{font-family:var(--display);font-size:1.25rem;margin-bottom:8px}
 .project .desc{font-size:.88rem;color:#444}
-.project .foot{display:flex;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1.5px dashed var(--ink);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.project .foot{display:flex;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1px solid #e3e3e0;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
 .project .arrow{transition:transform .3s}
 .project:hover .arrow{transform:translateX(6px)}
 .empty-msg{display:none;border:1.5px dashed var(--ink);padding:30px;text-align:center;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:#666}
@@ -150,7 +172,7 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 .pm-scroll{overflow-y:auto;flex:1}
 .pm-hero{display:grid;grid-template-columns:1.1fr .9fr;border-bottom:2px solid var(--ink)}
 .pm-hero .pm-photo{position:relative;min-height:380px;border-right:2px solid var(--ink);overflow:hidden}
-.pm-hero .pm-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.15)}
+.pm-hero .pm-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.95) contrast(1.05)}
 .pm-hero .pm-photo .ph-label{position:absolute;bottom:0;left:0;background:var(--ink);color:var(--paper);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;padding:6px 12px}
 .pm-hero .pm-photo.fallback{background-image:radial-gradient(var(--ink) 1px, transparent 1.4px);background-size:9px 9px}
 .pm-title{padding:46px 48px;display:flex;flex-direction:column;justify-content:center}
@@ -158,13 +180,13 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 .pm-title h2{font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:1.15}
 .pm-title .lieu{margin-top:12px;font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:#666}
 .pm-body{display:grid;grid-template-columns:.95fr 1.05fr;gap:0}
-.pm-left{padding:46px 48px;border-right:2px dashed var(--ink)}
+.pm-left{padding:46px 48px;border-right:1px solid #e3e3e0}
 .pm-right{padding:46px 48px}
 .pm-h{font-family:var(--display);font-size:1.15rem;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:10px}
 .pm-h .jp{color:var(--rouge);font-weight:500;font-size:.85em}
 .specs{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--ink);margin-bottom:40px}
-.spec{padding:16px 18px;border-bottom:1.5px dashed var(--ink)}
-.spec:nth-child(odd){border-right:1.5px dashed var(--ink)}
+.spec{padding:16px 18px;border-bottom:1px solid var(--ink)}
+.spec:nth-child(odd){border-right:1px solid #e3e3e0}
 .spec:nth-last-child(-n+2){border-bottom:none}
 .spec .k{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:#777}
 .spec .v{font-family:var(--display);font-weight:700;font-size:1rem;margin-top:3px}
@@ -181,7 +203,9 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 .tl-item .l{font-family:var(--display);font-weight:700}
 .tl-item .t{font-size:.84rem;color:#555}
 /* visionneuse 3D */
-.viewer{border:2px solid var(--ink);position:relative;height:430px;background:var(--paper);overflow:hidden;cursor:grab}
+.viewer{border:2px solid var(--ink);position:relative;height:430px;overflow:hidden;cursor:grab;background:linear-gradient(180deg,#EAF0F4 0%,#F6F4EF 62%,#E6E3DC 100%);transition:background .6s}
+.viewer.night{background:linear-gradient(180deg,#0A0E16 0%,#141A26 55%,#1E2430 100%)}
+.viewer.night .v-hint{background:#11151c;color:#cfd6df;border-color:#3a4452}
 .viewer:active{cursor:grabbing}
 .viewer canvas,.viewer svg{width:100%;height:100%;display:block}
 .viewer .v-hint{position:absolute;bottom:12px;left:12px;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;background:var(--paper);border:1.5px solid var(--ink);padding:5px 10px;pointer-events:none}
@@ -217,7 +241,7 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 /* ====== ATELIER / DÉMARCHE / CONTACT / FOOTER ====== */
 .atelier{background:var(--paper)}
 .atelier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));border:2px solid var(--ink);margin-top:50px}
-.stat{padding:38px 30px;border-right:1.5px dashed var(--ink);transition:background .3s}
+.stat{padding:38px 30px;border-right:1px solid #e3e3e0;transition:background .3s}
 .stat:last-child{border-right:none}
 .stat:hover{background:var(--rouge-soft)}
 .stat .num{font-family:var(--display);font-size:3rem;font-weight:800;color:var(--rouge);line-height:1}
@@ -231,7 +255,7 @@ h2 .jp{color:var(--rouge);font-weight:500;font-size:.6em;margin-left:14px;letter
 .step p{max-width:62ch;color:#444}
 .contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
 .contact-card{border:2px solid var(--ink);padding:36px;position:relative;background:var(--paper)}
-.contact-card::after{content:'';position:absolute;inset:12px -12px -12px 12px;background:repeating-linear-gradient(45deg,var(--rouge) 0 5px,transparent 5px 12px);z-index:-1}
+.contact-card::after{content:'';position:absolute;inset:12px -12px -12px 12px;background:var(--rouge);opacity:.92;z-index:-1}
 .field{margin-bottom:22px}
 .field label{display:block;font-size:.66rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 .field input,.field textarea{width:100%;font-family:var(--body);font-size:.95rem;padding:13px 14px;border:1.5px solid var(--ink);background:var(--gris);outline:none;transition:background .25s, box-shadow .25s}
@@ -279,13 +303,14 @@ footer .jp{color:var(--rouge)}
   .pm-hero .pm-photo{border-right:none;border-bottom:2px solid var(--ink);min-height:260px}
   .pm-title{padding:32px 22px}
   .pm-body{grid-template-columns:1fr}
-  .pm-left{border-right:none;border-bottom:2px dashed var(--ink)}
+  .pm-left{border-right:none;border-bottom:1px solid #e3e3e0}
   .pm-left,.pm-right{padding:34px 22px}
   .viewer{height:340px}
 }
 </style>
 </head>
 <body>
+<div id="loader" aria-hidden="true"><div class="l-logo"><span class="plus">+</span>YOHAKU</div><div class="l-sub">New York</div><div class="l-bar"></div></div>
 
 <div class="rail" aria-hidden="true">
   <div class="rail-fill" id="railFill"></div>
@@ -293,22 +318,22 @@ footer .jp{color:var(--rouge)}
 </div>
 
 <nav>
-  <a class="logo" href="#top"><span class="plus">+</span>ATELIER YOHAKU<span style="color:var(--rouge);font-weight:500">余白</span></a>
+  <a class="logo" href="#top"><span class="plus">+</span>YOHAKU<span class="logo-sub">New York</span></a>
   <ul class="nav-links">
-    <li><a href="#projets"><span class="jp">作</span>Projets</a></li>
-    <li><a href="#volume"><span class="jp">塔</span>Volume</a></li>
-    <li><a href="#atelier"><span class="jp">所</span>Atelier</a></li>
-    <li><a href="#demarche"><span class="jp">道</span>Démarche</a></li>
-    <li><a href="#contact"><span class="jp">話</span>Contact</a></li>
+    <li><a href="#projets">Projets</a></li>
+    <li><a href="#volume">Construction</a></li>
+    <li><a href="#atelier">Agence</a></li>
+    <li><a href="#demarche">Process</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ul>
   <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
 </nav>
 <ul class="mobile-menu" id="mobileMenu">
-  <li><a href="#projets"><span class="jp">作</span>Projets</a></li>
-  <li><a href="#volume"><span class="jp">塔</span>Volume</a></li>
-  <li><a href="#atelier"><span class="jp">所</span>Atelier</a></li>
-  <li><a href="#demarche"><span class="jp">道</span>Démarche</a></li>
-  <li><a href="#contact"><span class="jp">話</span>Contact</a></li>
+  <li><a href="#projets">Projets</a></li>
+  <li><a href="#volume">Construction</a></li>
+  <li><a href="#atelier">Agence</a></li>
+  <li><a href="#demarche">Process</a></li>
+  <li><a href="#contact">Contact</a></li>
 </ul>
 
 <!-- ====== HERO ====== -->
@@ -316,22 +341,29 @@ footer .jp{color:var(--rouge)}
   <canvas id="cityCanvas"></canvas>
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="hero-center">
-    <div class="eyebrow reveal"><span class="jp">建築事務所</span> Architecture · Gratte-ciels · New York</div>
-    <h1 class="reveal d1">Bâtir New York<br>comme on empile <span class="accent">un rêve vertical</span>.</h1>
-    <p class="reveal d2">L'atelier des hauteurs <span class="jp">余白</span> — chaque tour naît d'un vide à conquérir.</p>
+    <div class="eyebrow reveal">Cabinet d’architecture — New York City</div>
+    <h1 class="reveal d1">Nous dessinons<br>la <span class="accent">skyline</span> de demain.</h1>
+    <p class="reveal d2">Gratte-ciels, logements et lieux publics — de Manhattan à Brooklyn, depuis 2008.</p>
     <div class="hero-actions reveal d3">
       <a class="btn" href="#projets">Voir les projets <span class="arrow">→</span></a>
-      <a class="btn ghost" href="#volume">Voir une tour se construire</a>
+      <a class="btn ghost" href="#volume">Suivre un chantier</a>
     </div>
   </div>
-  <div class="scroll-hint"><span class="line"></span> Défiler <span style="color:var(--rouge)">下</span></div>
+  <div class="scroll-hint"><span class="line"></span> Défiler</div>
 </header>
+
+<!-- ====== TICKER ====== -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack">
+    <span>Manhattan<i class="sep">+</i>Brooklyn<i class="sep">+</i>One Yohaku Tower — 412 m<i class="sep">+</i>Hudson Yards<i class="sep">+</i>Park Avenue<i class="sep">+</i>Lower Manhattan 2040<i class="sep">+</i>The Hudson Museum<i class="sep">+</i>120 projets livrés<i class="sep">+</i></span><span>Manhattan<i class="sep">+</i>Brooklyn<i class="sep">+</i>One Yohaku Tower — 412 m<i class="sep">+</i>Hudson Yards<i class="sep">+</i>Park Avenue<i class="sep">+</i>Lower Manhattan 2040<i class="sep">+</i>The Hudson Museum<i class="sep">+</i>120 projets livrés<i class="sep">+</i></span>
+  </div>
+</div>
 
 <!-- ====== PROJETS ====== -->
 <section id="projets">
   <div class="sec-head reveal">
     <span class="sec-num">N°01</span>
-    <h2>Projets<span class="jp">作品</span></h2>
+    <h2>Projets</h2>
   </div>
   <p class="sec-sub reveal d1">Cliquez sur un projet pour ouvrir sa fiche complète : photographies, maquette 3D interactive et chronologie du chantier.</p>
 
@@ -349,7 +381,7 @@ footer .jp{color:var(--rouge)}
 <!-- ====== FICHE PROJET ====== -->
 <div class="pmodal" id="pmodal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
   <div class="pm-top">
-    <span class="crumb"><span class="jp">作</span> Projets / <span id="pmCrumb">—</span></span>
+    <span class="crumb">Projets / <span id="pmCrumb">—</span></span>
     <div class="pm-nav">
       <button class="pm-btn" id="pmPrev">← Préc.</button>
       <button class="pm-btn" id="pmNext">Suiv. →</button>
@@ -370,15 +402,15 @@ footer .jp{color:var(--rouge)}
     </div>
     <div class="pm-body">
       <div class="pm-left">
-        <div class="pm-h">Fiche technique<span class="jp">概要</span></div>
+        <div class="pm-h">Fiche technique</div>
         <div class="specs" id="pmSpecs"></div>
-        <div class="pm-h">Chronologie<span class="jp">工程</span></div>
+        <div class="pm-h">Chronologie</div>
         <div class="tl" id="pmTimeline"></div>
-        <div class="pm-h">Le projet<span class="jp">説明</span></div>
+        <div class="pm-h">Le projet</div>
         <div class="pm-desc" id="pmDesc"></div>
       </div>
       <div class="pm-right">
-        <div class="pm-h">Maquette 3D<span class="jp">模型</span></div>
+        <div class="pm-h">Maquette 3D</div>
         <div class="viewer" id="pmViewer">
           <span class="v-tag">Interactif</span>
           <canvas id="pmCanvas"></canvas>
@@ -386,6 +418,7 @@ footer .jp{color:var(--rouge)}
         </div>
         <div class="v-controls">
           <button id="vAuto" class="on">Rotation auto</button>
+          <button id="vNight">Nuit</button>
           <button id="vReset">Réinitialiser la vue</button>
         </div>
       </div>
@@ -400,7 +433,7 @@ footer .jp{color:var(--rouge)}
       <canvas id="towerCanvas"></canvas>
       <div class="tour-copy">
         <span class="sec-num">N°02</span>
-        <h2>One Yohaku Tower<span class="jp">塔</span></h2>
+        <h2>One Yohaku Tower</h2>
         <p>Défilez pour bâtir le gratte-ciel, étape par étape : on voit chaque système se mettre en place, des fondations au couronnement.</p>
         <ol class="tour-steps">
           <li><b>01</b> Fondations &amp; radier</li>
@@ -419,31 +452,31 @@ footer .jp{color:var(--rouge)}
 
 <!-- ====== ATELIER ====== -->
 <section class="atelier" id="atelier">
-  <div class="sec-head reveal"><span class="sec-num">N°03</span><h2>L'Atelier<span class="jp">事務所</span></h2></div>
-  <p class="sec-sub reveal d1">Installé à New York, l'atelier réunit architectes et ingénieurs autour d'une conviction : un gratte-ciel se pense d'abord par le vide qu'il libère au sol.</p>
+  <div class="sec-head reveal"><span class="sec-num">N°03</span><h2>L'Agence</h2></div>
+  <p class="sec-sub reveal d1">Fondée en 2008 à Tribeca, l'agence réunit 45 architectes et ingénieurs. Notre conviction : un gratte-ciel se juge autant à la rue qu'il anime qu'à la silhouette qu'il découpe dans le ciel.</p>
   <div class="atelier-grid reveal d2">
-    <div class="stat"><div class="num" data-count="48">0</div><div class="lab">Projets livrés</div></div>
-    <div class="stat"><div class="num" data-count="12">0</div><div class="lab">Masterplans</div></div>
-    <div class="stat"><div class="num" data-count="9">0</div><div class="lab">Prix &amp; distinctions</div></div>
-    <div class="stat"><div class="num" data-count="14">0</div><div class="lab">Collaborateurs</div></div>
+    <div class="stat"><div class="num" data-count="120">0</div><div class="lab">Projets livrés</div></div>
+    <div class="stat"><div class="num" data-count="28">0</div><div class="lab">Tours construites</div></div>
+    <div class="stat"><div class="num" data-count="16">0</div><div class="lab">Prix &amp; distinctions</div></div>
+    <div class="stat"><div class="num" data-count="45">0</div><div class="lab">Collaborateurs</div></div>
   </div>
 </section>
 
 <!-- ====== DÉMARCHE ====== -->
 <section id="demarche">
-  <div class="sec-head reveal"><span class="sec-num">N°04</span><h2>Démarche<span class="jp">道</span></h2></div>
-  <p class="sec-sub reveal d1">Notre méthode suit la voie du plan : lire, tracer, construire, transmettre.</p>
+  <div class="sec-head reveal"><span class="sec-num">N°04</span><h2>Process</h2></div>
+  <p class="sec-sub reveal d1">Du zoning à la livraison : la méthode qui fait sortir une tour de terre à New York.</p>
   <div class="steps">
-    <div class="step reveal"><h3>Lire le territoire<span class="jp">読む</span></h3><p>Avant le premier trait : arpenter, cartographier, écouter. Le site dicte plus que le programme.</p></div>
-    <div class="step reveal"><h3>Tracer le vide<span class="jp">描く</span></h3><p>Nous dessinons d'abord les espaces libres — rues, cours, jardins — puis le bâti vient les tenir.</p></div>
-    <div class="step reveal"><h3>Construire juste<span class="jp">建てる</span></h3><p>Matériaux locaux, structures lisibles, détails durables. Rien de superflu, rien de manquant.</p></div>
-    <div class="step reveal"><h3>Transmettre<span class="jp">伝える</span></h3><p>Un quartier réussi continue d'évoluer sans nous. Nous livrons des plans ouverts, pas des objets finis.</p></div>
+    <div class="step reveal"><h3>Analyser le site</h3><p>Zoning, droits aériens, vues protégées, vent et lumière : chaque parcelle de New York a ses règles. Nous les lisons avant de dessiner.</p></div>
+    <div class="step reveal"><h3>Sculpter la silhouette</h3><p>Retraits, élancement, couronnement : la tour négocie avec le ciel et ses voisines. Chaque étage gagne sa vue.</p></div>
+    <div class="step reveal"><h3>Construire vertical</h3><p>Noyau béton, méga-colonnes, façade rideau : nous suivons le chantier semaine par semaine, du radier au couronnement.</p></div>
+    <div class="step reveal"><h3>Activer la rue</h3><p>Halls traversés, commerces, esplanades : le socle rend à la ville ce que la hauteur lui prend. Une tour réussie commence au trottoir.</p></div>
   </div>
 </section>
 
 <!-- ====== CONTACT ====== -->
 <section id="contact">
-  <div class="sec-head reveal"><span class="sec-num">N°05</span><h2>Contact<span class="jp">連絡</span></h2></div>
+  <div class="sec-head reveal"><span class="sec-num">N°05</span><h2>Contact</h2></div>
   <p class="sec-sub reveal d1">Un terrain, une idée, un quartier à réinventer ? Parlons-en.</p>
   <div class="contact-wrap">
     <div class="contact-card reveal d1">
@@ -467,8 +500,8 @@ footer .jp{color:var(--rouge)}
 </section>
 
 <footer>
-  <span>© 2026 Atelier Yohaku <span class="jp">余白</span></span>
-  <span>Architecture · Gratte-ciels · <span class="jp">建築</span></span>
+  <span>© 2026 Yohaku Architecture PLLC</span>
+  <span>Architecture · Development · Interiors</span>
   <span>New York, USA</span>
 </footer>
 
@@ -1974,6 +2007,41 @@ function createRenderer(canvas){
 }
 
 /* ============================================================
+   TEXTURES DE FACADES (fenetres generees en canvas)
+   ============================================================ */
+function facadeTexture(o){
+  o=o||{};
+  const cols=o.cols||6, rows=o.rows||14, cw=18, ch=22;
+  const c=document.createElement('canvas'); c.width=cols*cw; c.height=rows*ch;
+  const x=c.getContext('2d');
+  x.fillStyle=o.base||'#D8D5CE'; x.fillRect(0,0,c.width,c.height);
+  for(let i=0;i<cols;i++)for(let j=0;j<rows;j++){
+    let f;
+    if(o.night){
+      f=Math.random()<(o.lit!==undefined?o.lit:.4)?(Math.random()<.7?'#FFD98A':'#FFEFC4'):'#10141B';
+    }else{
+      const r=Math.random();
+      f=r<.72?(o.glass||'#9FB6C4'):(r<.88?'#7E97A6':'#B9CAD4');
+    }
+    x.fillStyle=f;
+    x.fillRect(i*cw+3, j*ch+3, cw-6, ch-7);
+  }
+  const t=new THREE.CanvasTexture(c);
+  t.anisotropy=4; return t;
+}
+// paires jour/nuit partagees (performance) — varietes de facades
+let FAC=null;
+function facadePool(){
+  if(FAC) return FAC;
+  FAC=[];
+  const variants=[{base:'#D8D5CE',glass:'#9FB6C4'},{base:'#CFC9BE',glass:'#8FA8B8'},{base:'#DDDAD4',glass:'#AABDC9'},{base:'#C9CCCE',glass:'#97ACBA'},{base:'#E2DFD8',glass:'#A8BAC4'}];
+  variants.forEach(v=>{
+    FAC.push({day:facadeTexture(v), night:facadeTexture({night:true,lit:.38})});
+  });
+  return FAC;
+}
+
+/* ============================================================
    DONNÉES PROJETS
    ============================================================ */
 const PROJECTS = [
@@ -2050,17 +2118,38 @@ const viewer=(function(){
   const camera=new THREE.PerspectiveCamera(38,1,.1,300);
   let model=null, rotY=.6, rotX=.35, targetRotY=.6, targetRotX=.35, dist=26, lookY=2.4, auto=true, raf=null, dragging=false, lx=0, ly=0;
 
-  const inkLine=()=>new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.9});
+  const inkLine=()=>new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.55});
   const redLine=()=>new THREE.LineBasicMaterial({color:ROUGE_VIF});
   const inkFill=()=>new THREE.MeshBasicMaterial({color:INK});
   const steelFill=()=>new THREE.MeshBasicMaterial({color:0x2A2A2C});
   const softFill=()=>new THREE.MeshBasicMaterial({color:0xF4F4F2});
   const whiteFill=()=>new THREE.MeshBasicMaterial({color:0xffffff});
   const redMesh=()=>new THREE.MeshBasicMaterial({color:ROUGE});
-  const glassFill=()=>new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.45});
-  const glassBlue=()=>new THREE.MeshBasicMaterial({color:0xCBDCE7,transparent:true,opacity:.6});
+  const glassFill=()=>new THREE.MeshBasicMaterial({color:0xBFD2DE,transparent:true,opacity:.5});
+  const glassBlue=()=>new THREE.MeshBasicMaterial({color:0x9DB6C6,transparent:true,opacity:.72});
   function edges(geo,mat){return new THREE.LineSegments(new THREE.EdgesGeometry(geo),mat)}
-  // solid volume: slightly inset face + crisp edges (also works in SVG)
+
+  // --- realism: textured facades + night mode registries (reset each show) ---
+  let night=false; let facadeMeshes=[]; let flatNight=[];
+  const POOL=facadePool();
+  function facadeMats(){
+    const pair=POOL[(Math.random()*POOL.length)|0];
+    const side=new THREE.MeshBasicMaterial({map:night?pair.night:pair.day});
+    const top=new THREE.MeshBasicMaterial({color:0x6B6B6E});
+    const bot=new THREE.MeshBasicMaterial({color:0x202024});
+    facadeMeshes.push({side,pair});
+    return [side,side,top,bot,side,side];
+  }
+  function registerFlat(mat,day,nightC){flatNight.push({mat,day,nightC});mat.color.setHex(night?nightC:day);return mat;}
+  function applyNight(v){
+    night=v;
+    facadeMeshes.forEach(o=>{o.side.map=night?o.pair.night:o.pair.day;o.side.needsUpdate=true;});
+    flatNight.forEach(o=>o.mat.color.setHex(night?o.nightC:o.day));
+    scene.fog.color.setHex(night?0x0B0E14:0xFFFFFF);
+    box.classList.toggle('night',night);
+  }
+
+  // solid volume (non-building): inset face + crisp edges
   function solid(geo,fill,line){
     const grp=new THREE.Group();
     const f=geo.clone(); f.scale(.992,.992,.992);
@@ -2068,27 +2157,29 @@ const viewer=(function(){
     grp.add(edges(geo,line||inkLine()));
     return grp;
   }
-  // building on ground at (x,z)
+  // textured building on ground at (x,z)
   function block(w,h,d,x,z,red){
     const geo=new THREE.BoxGeometry(w,h,d); geo.translate(0,h/2,0);
-    const g=solid(geo, red?redMesh():softFill(), red?redLine():inkLine());
+    const g=new THREE.Group();
+    if(red){g.add(new THREE.Mesh(geo,redMesh()));g.add(edges(geo,redLine()));}
+    else{const f=geo.clone(); f.scale(.998,1,.998); g.add(new THREE.Mesh(f,facadeMats())); g.add(edges(geo,inkLine()));}
     g.position.set(x,0,z); return g;
   }
-  // NY-style setback tower (stacked boxes shrinking upward), optional spire
+  // NY-style setback tower (stacked textured boxes), optional spire/crown
   function setbackTower(x,z,h,w,red){
     const g=new THREE.Group(); g.position.set(x,0,z);
     const seg=h>10?3:(h>5?2:1); let y=0;
     for(let i=0;i<seg;i++){
-      const sh=h/seg, cw=w*(1-i*0.17);
+      const sh=h/seg, cw=w*(1-i*0.17), top=(i===seg-1);
       const geo=new THREE.BoxGeometry(cw,sh,cw); geo.translate(0,sh/2,0);
-      const top=(i===seg-1);
-      const g2=solid(geo,(red&&top)?redMesh():softFill(),(red&&top)?redLine():inkLine());
-      g2.position.y=y; g.add(g2); y+=sh;
+      const grp=new THREE.Group(); grp.position.y=y;
+      if(red&&top){grp.add(new THREE.Mesh(geo,redMesh()));grp.add(edges(geo,redLine()));}
+      else{const f=geo.clone(); f.scale(.998,1,.998); grp.add(new THREE.Mesh(f,facadeMats())); grp.add(edges(geo,inkLine()));}
+      g.add(grp); y+=sh;
     }
-    if(h>12){const sp=new THREE.CylinderGeometry(.02,.12,h*.18,5); sp.translate(0,y+h*.09,0); g.add(new THREE.Mesh(sp,red?redMesh():inkFill()));}
+    if(h>12){const sp=new THREE.CylinderGeometry(.02,.12,h*.18,5); sp.translate(0,y+h*.09,0); g.add(new THREE.Mesh(sp,red?redMesh():steelFill()));}
     return g;
   }
-  // ring/field of surrounding skyscrapers (the "buildings around buildings")
   function skyline(g,opts){
     opts=opts||{}; const inner=opts.inner||8, outer=opts.outer||17, count=opts.count||70, max=opts.max||12;
     for(let i=0;i<count;i++){
@@ -2098,29 +2189,29 @@ const viewer=(function(){
       g.add(setbackTower(x,z,h,w,Math.random()<.04));
     }
   }
-  // perimeter (courtyard) block: four bars around a court
   function perimeterBlock(g,cx,cz,size,h){
     const t=size/2-.5;
-    const mk=(w,d,x,z)=>{const geo=new THREE.BoxGeometry(w,h,d);geo.translate(0,h/2,0);const b=solid(geo,softFill(),inkLine());b.position.set(cx+x,0,cz+z);g.add(b);};
+    const mk=(w,d,x,z)=>{const b=block(w,h,d,cx+x,cz+z,false);g.add(b);};
     mk(size,1,0,t); mk(size,1,0,-t); mk(1,size-2,t,0); mk(1,size-2,-t,0);
   }
-  // stylized tree
   function tree(x,z,s){
     s=s||1; const g=new THREE.Group();
     const tr=new THREE.CylinderGeometry(.06,.09,.9*s,5); tr.translate(0,.45*s,0);
-    g.add(new THREE.Mesh(tr,inkFill()));
+    g.add(new THREE.Mesh(tr,new THREE.MeshBasicMaterial({color:0x5A4632})));
     const cr=new THREE.ConeGeometry(.6*s,1.4*s,7); cr.translate(0,1.35*s,0);
-    g.add(new THREE.Mesh(cr,softFill())); g.add(edges(cr,inkLine()));
+    g.add(new THREE.Mesh(cr,registerFlat(new THREE.MeshBasicMaterial({color:0x6E8B5A}),0x6E8B5A,0x2C3A28)));
     g.position.set(x,0,z); return g;
   }
+  // realistic ground: concrete plane + faint street grid
   function ground(g,n){
-    n=n||14; const pts=[];
-    for(let x=-n;x<=n;x+=2){for(let z=-n;z<=n;z+=2){const s=.16;pts.push(x-s,0,z,x+s,0,z,x,0,z-s,x,0,z+s);}}
-    const geo=new THREE.BufferGeometry();
-    geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
-    g.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.2})));
+    n=n||14; const S=n*1.25;
+    const plane=new THREE.Mesh(new THREE.PlaneGeometry(S*2,S*2),registerFlat(new THREE.MeshBasicMaterial({color:0xC4C4BF}),0xC4C4BF,0x14161C));
+    plane.rotation.x=-Math.PI/2; plane.position.y=-0.03; g.add(plane);
+    const pts=[];
+    for(let x=-n;x<=n;x+=2){pts.push(x,0,-n,x,0,n);} for(let z=-n;z<=n;z+=2){pts.push(-n,0,z,n,0,z);}
+    const geo=new THREE.BufferGeometry(); geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+    g.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.16})));
   }
-
   const builders={
     // ONE YOHAKU TOWER -- supertall with NY setbacks, ringed by skyscrapers
     tower(g){
@@ -2238,14 +2329,17 @@ const viewer=(function(){
 
   document.getElementById('vAuto').addEventListener('click',function(){auto=!auto;this.classList.toggle('on',auto);});
   document.getElementById('vReset').addEventListener('click',()=>{targetRotY=.6;targetRotX=.35;});
+  document.getElementById('vNight').addEventListener('click',function(){applyNight(!night);this.classList.toggle('on',night);this.textContent=night?'Jour':'Nuit';});
 
   return {
     show(type){
-      if(model){scene.remove(model);model.traverse(o=>{o.geometry&&o.geometry.dispose();o.material&&o.material.dispose&&o.material.dispose();});}
+      if(model){scene.remove(model);model.traverse(o=>{o.geometry&&o.geometry.dispose();o.material&&(Array.isArray(o.material)?o.material.forEach(m=>m.dispose&&m.dispose()):o.material.dispose&&o.material.dispose());});}
+      facadeMeshes=[]; flatNight=[];
       model=new THREE.Group();
       dist=26; lookY=2.4;
       (builders[type]||builders.tower)(model);
       scene.add(model);
+      applyNight(night);          // garde l'état jour/nuit choisi
       targetRotY=.6;targetRotX=.35;rotY=.6;rotX=.35;
       resize();
       if(!raf) frame();
@@ -2472,7 +2566,7 @@ document.addEventListener('keydown',e=>{
 
   const phaseLabel=document.getElementById('phaseLabel');
   const tourBar=document.getElementById('tourBar');
-  const phases=['Étape 01 — Fondations 基礎','Étape 02 — Noyau 核','Étape 03 — Planchers 床','Étape 04 — Structure 骨','Étape 05 — Façade 外装','Étape 06 — Couronnement 完成'];
+  const phases=['Étape 01 — Fondations','Étape 02 — Noyau béton','Étape 03 — Planchers','Étape 04 — Structure acier','Étape 05 — Façade rideau','Étape 06 — Couronnement'];
   const stepEls=[...document.querySelectorAll('.tour-steps li')];
   let lastPhase=-1, smoothP=0;
 
@@ -2607,6 +2701,46 @@ document.getElementById('sendBtn').addEventListener('click',()=>{
   toast.classList.add('show');nom.value=email.value=msg.value='';
   setTimeout(()=>toast.classList.remove('show'),4000);
 });
+
+/* ====== Loader ====== */
+(function(){
+  const l=document.getElementById('loader'); if(!l)return;
+  const hide=()=>{l.classList.add('done');setTimeout(()=>l.style.display='none',800);};
+  let done=false; const go=()=>{if(done)return;done=true;hide();};
+  window.addEventListener('load',()=>setTimeout(go,600));
+  setTimeout(go,2600); // filet de sécurité
+})();
+
+/* ====== Nav intelligente (se masque en descendant, réapparaît en montant) ====== */
+(function(){
+  const nav=document.querySelector('nav'); let last=window.scrollY, acc=0;
+  window.addEventListener('scroll',()=>{
+    const y=window.scrollY, d=y-last; last=y;
+    if(document.body.classList.contains('modal-open'))return;
+    acc=d>0?Math.max(0,acc+d):Math.min(0,acc+d);
+    if(y>160 && d>0 && acc>40){nav.classList.add('hide');acc=0;}
+    else if(d<0 && acc<-30){nav.classList.remove('hide');acc=0;}
+    if(y<120)nav.classList.remove('hide');
+  },{passive:true});
+})();
+
+/* ====== Parallaxe légère du hero (titre) ====== */
+(function(){
+  const c=document.querySelector('.hero-center'); if(!c||reduceMotion)return;
+  window.addEventListener('scroll',()=>{const y=window.scrollY;if(y<window.innerHeight){c.style.transform='translateY('+(y*0.18)+'px)';c.style.opacity=String(Math.max(0,1-y/(window.innerHeight*.75)));}},{passive:true});
+})();
+
+/* ====== Tilt des cartes projet (3D au survol) ====== */
+(function(){
+  if(reduceMotion||matchMedia('(hover:none)').matches)return;
+  document.addEventListener('pointermove',e=>{
+    const card=e.target.closest&&e.target.closest('.project'); if(!card)return;
+    const r=card.getBoundingClientRect();
+    const rx=((e.clientY-r.top)/r.height-.5)*-6, ry=((e.clientX-r.left)/r.width-.5)*6;
+    card.style.transform='perspective(800px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateZ(4px)';
+  },{passive:true});
+  document.addEventListener('pointerout',e=>{const card=e.target.closest&&e.target.closest('.project');if(card)card.style.transform='';},{passive:true});
+})();
 </script>
 </body>
 </html>
