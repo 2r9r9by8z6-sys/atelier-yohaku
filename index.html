@@ -468,9 +468,9 @@ body.night .scroll-hint{color:#8a92a0}
         <ol class="tour-steps">
           <li><b>01</b> Fondations &amp; radier</li>
           <li><b>02</b> Noyau central</li>
-          <li><b>03</b> Planchers</li>
-          <li><b>04</b> Structure (poteaux)</li>
-          <li><b>05</b> Façade vitrée</li>
+          <li><b>03</b> Ossature (poteaux)</li>
+          <li><b>04</b> Planchers</li>
+          <li><b>05</b> Façade miroir</li>
           <li><b>06</b> Couronnement</li>
         </ol>
         <div class="tour-phase"><span class="dot"></span><span id="phaseLabel">Étape 01 — Fondations</span></div>
@@ -2563,21 +2563,21 @@ document.addEventListener('keydown',e=>{
   for(let x=0;x<=N;x++)for(let z=0;z<=N;z++){const cx=(x-C)*SP,cz=(z-C)*SP,s=.15;pts.push(cx-s,0,cz,cx+s,0,cz,cx,0,cz-s,cx,0,cz+s);}
   const crossGeo=new THREE.BufferGeometry(); crossGeo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
   scene.add(new THREE.LineSegments(crossGeo,new THREE.LineBasicMaterial({color:INK,transparent:true,opacity:.16})));
-  let mouseX=0;
-  window.addEventListener('mousemove',e=>{mouseX=(e.clientX/window.innerWidth-.5);},{passive:true});
+  let mouseX=0, mouseY=0, tgX=0, tgY=0;
+  window.addEventListener('mousemove',e=>{tgX=(e.clientX/window.innerWidth-.5);tgY=(e.clientY/window.innerHeight-.5);},{passive:true});
   const t0=performance.now();
   function resize(){const el=renderer.domElement,w=el.parentElement.clientWidth,h=el.parentElement.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
   window.addEventListener('resize',resize);resize();
   function frame(t){
     const el=t-t0;
     buildings.forEach(b=>{const k=Math.max(0,Math.min(1,(el-b.userData.delay)/950));b.scale.y=.001+(1-Math.pow(1-k,3))*.999;});
-    const heroH=document.querySelector('.hero').offsetHeight;
-    const p=Math.min(1,window.scrollY/(heroH*1.1));
-    const auto=reduceMotion?0:el*0.00005;
-    const angle=-.35+auto+p*1.1+(reduceMotion?0:mouseX*.2);
-    const radius=30-p*8, height=5.5+p*15;
-    camera.position.set(Math.sin(angle)*radius,height,Math.cos(angle)*radius);
-    camera.lookAt(0,6,0);
+    // AUCUNE animation au scroll : la camera ne bouge qu'avec la souris (vue du dessus, agrandie)
+    mouseX+=(tgX-mouseX)*.06; mouseY+=(tgY-mouseY)*.06;
+    const angle=-.35+(reduceMotion?0:mouseX*.7);          // pivot gauche/droite a la souris
+    const elev=reduceMotion?.95:(.86 - mouseY*.32);        // vue plongeante (du dessus)
+    const radius=20.5;                                     // agrandie
+    camera.position.set(Math.sin(angle)*radius*Math.cos(elev), radius*Math.sin(elev), Math.cos(angle)*radius*Math.cos(elev));
+    camera.lookAt(0,1.6,0);
     renderer.render(scene,camera);
     requestAnimationFrame(frame);
   }
@@ -2595,27 +2595,48 @@ document.addEventListener('keydown',e=>{
   const renderer=createRenderer(canvas);
   if(!renderer) return;
   const scene=new THREE.Scene();
-  scene.fog=new THREE.Fog(0x0E0E0E,34,90);
+  scene.fog=new THREE.Fog(0x0B0D12,40,104);
   const camera=new THREE.PerspectiveCamera(40,1,.1,260);
   const cl=v=>Math.max(0,Math.min(1,v));
 
-  // color-coded construction systems (strong contrast on dark bg)
-  const concreteMat=new THREE.MeshBasicMaterial({color:0x4A4A4E});
-  const steelMat=new THREE.MeshBasicMaterial({color:0x8A93A0});
-  const whiteMat=new THREE.MeshBasicMaterial({color:0xFFFFFF});
-  const redMat=new THREE.MeshBasicMaterial({color:ROUGE});
+  const LIT=!window.__svgFallback && !!renderer.shadowMap;
+  if(LIT){renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;if('outputEncoding' in renderer)renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.06;}
+
+  // ciel cube (reflets sur le verre) : ciel sombre + horizon clair
+  function makeEnv(){const f=[];for(let i=0;i<6;i++){const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');
+    if(i===2){x.fillStyle='#2b3b54';x.fillRect(0,0,64,64);}
+    else if(i===3){x.fillStyle='#05070b';x.fillRect(0,0,64,64);}
+    else{const g=x.createLinearGradient(0,0,0,64);g.addColorStop(0,'#33455f');g.addColorStop(.55,'#16202e');g.addColorStop(.6,'#caa37a');g.addColorStop(.66,'#2a2018');g.addColorStop(1,'#070a0f');x.fillStyle=g;x.fillRect(0,0,64,64);}
+    f.push(c);}
+    const t=new THREE.CubeTexture(f);t.needsUpdate=true;return t;}
+  const ENV=makeEnv(); if(LIT)scene.environment=ENV;
+  const hemi=new THREE.HemisphereLight(0x9fb4d6,0x1a1d24,LIT?.72:0); scene.add(hemi);
+  const sun=new THREE.DirectionalLight(0xfff0d8,LIT?1.05:0); sun.position.set(16,32,20);
+  if(LIT){sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);const d=24,cm=sun.shadow.camera;cm.left=-d;cm.right=d;cm.top=d;cm.bottom=-d;cm.near=1;cm.far=120;sun.shadow.bias=-0.0005;sun.shadow.normalBias=.02;}
+  scene.add(sun,sun.target);
+
+  const matF=(c,o)=>{o=o||{};return LIT?new THREE.MeshStandardMaterial(Object.assign({color:c},o)):new THREE.MeshBasicMaterial({color:c});};
+  const concreteMat=matF(0x55585e,{roughness:.96,metalness:.02});
+  const steelMat=matF(0x99a2b0,{roughness:.5,metalness:.7,envMap:LIT?ENV:null,envMapIntensity:.6});
+  const whiteMat=matF(0xF1F2F4,{roughness:.86,metalness:.03});
+  const redMat=matF(0xC1121F,{roughness:.5,metalness:.15});
+  // VERRE MIROIR : opaque + reflechissant -> ne montre pas l'interieur
+  const mirror=LIT?new THREE.MeshStandardMaterial({color:0x22303f,metalness:.96,roughness:.06,envMap:ENV,envMapIntensity:1.2}):new THREE.MeshBasicMaterial({color:0x4d6c88});
   const redLine=new THREE.LineBasicMaterial({color:ROUGE_VIF});
-  const whiteLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.55});
-  const greyLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.28});
-  const glassMat=new THREE.MeshBasicMaterial({color:0x9CC2DA,transparent:true,opacity:0,side:THREE.DoubleSide});
+  const whiteLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.5});
+  const greyLine=new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.3});
   const E=(geo,m)=>new THREE.LineSegments(new THREE.EdgesGeometry(geo),m);
 
-  const FLOORS=26, FH=.62, HALF=2.7, BO=.55, H=FLOORS*FH;
-  const TW=Math.PI/4;                         // torsion totale -> silhouette One WTC (8 facettes)
+  const FLOORS=22, FH=.82, HALF=2.7, BO=.6, H=FLOORS*FH;     // etages espaces (moins compresses)
+  const TW=Math.PI/4;
   function lvl(i){const t=i/FLOORS; return {hw:HALF*(1-0.44*t), rot:TW*t};}
   const corners=[[1,1],[1,-1],[-1,-1],[-1,1]];
 
-  // 1) FONDATIONS : radier sombre + fosse rouge
+  // sol sombre (recoit les ombres)
+  const gp=new THREE.Mesh(new THREE.PlaneGeometry(64,64),matF(0x121419,{roughness:1,metalness:0}));
+  gp.rotation.x=-Math.PI/2; gp.position.y=-0.02; gp.receiveShadow=true; scene.add(gp);
+
+  // 1) FONDATIONS
   const found=new THREE.Group();
   const pad=new THREE.BoxGeometry(HALF*2.5,BO,HALF*2.5); pad.translate(0,BO/2,0);
   found.add(new THREE.Mesh(pad,concreteMat)); found.add(E(pad,whiteLine));
@@ -2624,113 +2645,107 @@ document.addEventListener('keydown',e=>{
   corners.forEach(c=>{const f=new THREE.BoxGeometry(.5,.5,.5);f.translate(c[0]*HALF*.8,.25,c[1]*HALF*.8);found.add(new THREE.Mesh(f,concreteMat));});
   scene.add(found);
 
-  // 2) NOYAU : noyau beton carre central
+  // 2) NOYAU
   const coreGeo=new THREE.BoxGeometry(1.7,H,1.7); coreGeo.translate(0,H/2+BO,0);
   const core=new THREE.Mesh(coreGeo,concreteMat); const coreE=E(coreGeo,redLine);
   scene.add(core,coreE);
 
-  // 3-5) par etage : planchers (blanc), poteaux (acier), facade (verre bleu)
-  // chaque niveau tourne+retrecit -> forme effilee a facettes du One WTC
+  // 3-5) par etage : ossature (planchers+poteaux) puis enveloppe verre-miroir (fermee)
   const slabs=[],cols=[],pans=[];
   const colGeo=new THREE.BoxGeometry(.16,FH,.16);
   for(let i=0;i<FLOORS;i++){
     const L=lvl(i), y=BO+(i+1)*FH, hw=L.hw;
-    const sg=new THREE.BoxGeometry(hw*2,FH*.16,hw*2);
+    const sg=new THREE.BoxGeometry(hw*2,FH*.14,hw*2);
     const sl=new THREE.Group(); sl.add(new THREE.Mesh(sg,whiteMat)); sl.add(E(sg,greyLine));
     sl.position.y=y; sl.rotation.y=L.rot; sl.visible=false; scene.add(sl); slabs.push(sl);
     const cg=new THREE.Group(); cg.rotation.y=L.rot;
     corners.forEach(c=>{const m=new THREE.Mesh(colGeo,steelMat); m.position.set(c[0]*hw,BO+(i+.5)*FH,c[1]*hw); cg.add(m);});
     cg.visible=false; scene.add(cg); cols.push(cg);
-    const pg=new THREE.BoxGeometry(hw*2*.99,FH*.94,hw*2*.99);
-    const pn=new THREE.Mesh(pg,glassMat.clone()); pn.position.y=BO+(i+.5)*FH; pn.rotation.y=L.rot; pn.visible=false; scene.add(pn); pans.push(pn);
+    const pg=new THREE.BoxGeometry(hw*2*.985,FH*.99,hw*2*.985);
+    const pn=new THREE.Mesh(pg,mirror); pn.position.y=BO+(i+.5)*FH; pn.rotation.y=L.rot; pn.visible=false; scene.add(pn); pans.push(pn);
   }
 
-  // 6) COURONNEMENT : parapet (carre tourne) + longue fleche (signature One WTC)
+  // 6) COURONNEMENT : parapet + longue fleche (One WTC)
   const topHw=lvl(FLOORS).hw;
   const crown=new THREE.Group(); crown.rotation.y=TW;
-  const para=new THREE.BoxGeometry(topHw*2*1.05,FH*1.3,topHw*2*1.05); para.translate(0,FH*.65,0);
+  const para=new THREE.BoxGeometry(topHw*2*1.05,FH*1.2,topHw*2*1.05); para.translate(0,FH*.6,0);
   crown.add(new THREE.Mesh(para,whiteMat)); crown.add(E(para,redLine));
-  const mast=new THREE.CylinderGeometry(.03,.14,5,8); mast.translate(0,FH*1.3+2.5,0); crown.add(new THREE.Mesh(mast,steelMat));
-  const tip=new THREE.CylinderGeometry(0,.06,1.1,6); tip.translate(0,FH*1.3+5.4,0); crown.add(new THREE.Mesh(tip,redMat));
+  const mast=new THREE.CylinderGeometry(.03,.14,5.4,8); mast.translate(0,FH*1.2+2.7,0); crown.add(new THREE.Mesh(mast,steelMat));
+  const tip=new THREE.CylinderGeometry(0,.06,1.1,6); tip.translate(0,FH*1.2+5.8,0); crown.add(new THREE.Mesh(tip,redMat));
   crown.position.y=BO+H; crown.visible=false; scene.add(crown);
 
-  // Statue de la Liberte (symbole, revelee au couronnement)
-  const greenMat=new THREE.MeshBasicMaterial({color:0x7FB3A1});
+  // Statue de la Liberte (symbole)
+  const greenMat=matF(0x7FB3A1,{roughness:.7,metalness:.1});
   const statue=new THREE.Group();
   const ped=new THREE.BoxGeometry(1.1,1.2,1.1); ped.translate(0,.6,0); statue.add(new THREE.Mesh(ped,concreteMat)); statue.add(E(ped,whiteLine));
   const body=new THREE.ConeGeometry(.42,2,7); body.translate(0,2.1,0); statue.add(new THREE.Mesh(body,greenMat));
   const head=new THREE.SphereGeometry(.2,8,6); head.translate(0,3.2,0); statue.add(new THREE.Mesh(head,greenMat));
   const arm=new THREE.CylinderGeometry(.05,.05,1,5); arm.rotateZ(-.5); arm.translate(.45,3.05,0); statue.add(new THREE.Mesh(arm,greenMat));
   const torch=new THREE.ConeGeometry(.12,.32,6); torch.translate(.78,3.55,0); statue.add(new THREE.Mesh(torch,redMat));
-  statue.position.set(-(HALF+5),0,3.5); statue.visible=false; scene.add(statue);
+  statue.position.set(-(HALF+5.5),0,4); statue.visible=false; scene.add(statue);
 
   // bande rouge "niveau en chantier"
-  const bandGeo=new THREE.BoxGeometry(HALF*2.1,.16,HALF*2.1);
+  const bandGeo=new THREE.BoxGeometry(HALF*2.12,.16,HALF*2.12);
   const band=new THREE.Mesh(bandGeo,redMat); scene.add(band);
 
-  // GRUE de chantier rouge
+  // GRUE de chantier
   const crane=new THREE.Group();
   const mastGeo=new THREE.BoxGeometry(.22,H+4,.22); mastGeo.translate(0,(H+4)/2,0);
   crane.add(new THREE.Mesh(mastGeo,steelMat)); crane.add(E(mastGeo,redLine));
   const jib=new THREE.BoxGeometry(11,.2,.2); jib.translate(3.2,H+3.6,0); crane.add(new THREE.Mesh(jib,redMat));
   const cjib=new THREE.BoxGeometry(3,.2,.2); cjib.translate(-1.2,H+3.6,0); crane.add(new THREE.Mesh(cjib,steelMat));
-  crane.position.set(HALF+4.5,0,1); scene.add(crane);
+  crane.position.set(HALF+5,0,1.5); scene.add(crane);
 
-  // sol pointillé + emprise
+  // sol pointille
   const gpts=[];
-  for(let i=0;i<240;i++){const a=Math.random()*Math.PI*2,r=5+Math.random()*15;gpts.push(Math.cos(a)*r,0,Math.sin(a)*r,Math.cos(a)*r,.05,Math.sin(a)*r);}
+  for(let i=0;i<240;i++){const a=Math.random()*Math.PI*2,r=5+Math.random()*16;gpts.push(Math.cos(a)*r,0,Math.sin(a)*r,Math.cos(a)*r,.05,Math.sin(a)*r);}
   const gGeo=new THREE.BufferGeometry(); gGeo.setAttribute('position',new THREE.Float32BufferAttribute(gpts,3));
-  scene.add(new THREE.LineSegments(gGeo,new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.25})));
+  scene.add(new THREE.LineSegments(gGeo,new THREE.LineBasicMaterial({color:0xFFFFFF,transparent:true,opacity:.18})));
+
+  // ombres : tout ce qui est maille projette/recoit (sauf le sol qui ne fait que recevoir)
+  if(LIT) scene.traverse(o=>{if(o.isMesh&&o!==gp){o.castShadow=true;o.receiveShadow=true;}});
 
   const phaseLabel=document.getElementById('phaseLabel');
   const tourBar=document.getElementById('tourBar');
-  const phases=['Étape 01 — Fondations','Étape 02 — Noyau béton','Étape 03 — Planchers','Étape 04 — Structure acier','Étape 05 — Façade rideau','Étape 06 — Couronnement'];
+  const phases=['Étape 01 — Fondations','Étape 02 — Noyau','Étape 03 — Ossature','Étape 04 — Planchers','Étape 05 — Façade miroir','Étape 06 — Couronnement'];
   const stepEls=[...document.querySelectorAll('.tour-steps li')];
   let lastPhase=-1, smoothP=0;
 
   function resize(){const el=renderer.domElement,w=el.parentElement.clientWidth,h=el.parentElement.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
   window.addEventListener('resize',resize);resize();
 
-  function reveal(p,a,b,i){return cl(((p-a)/(b-a))*FLOORS-i);}
-
   function frame(){
     const rect=wrap.getBoundingClientRect();
     const total=rect.height-window.innerHeight;
     const raw=cl(-rect.top/total);
-    smoothP+=(raw-smoothP)*.09; const p=smoothP;
+    smoothP+=(raw-smoothP)*.06; const p=smoothP;     // scroll plus fluide
 
-    // étape 1 : fondations
-    const foundP=cl(p/.10); found.scale.setScalar(.6+.4*foundP); found.visible=foundP>.01;
-    // étape 2 : noyau
-    const coreP=cl((p-.10)/.18); core.scale.y=Math.max(.001,coreP); coreE.scale.y=core.scale.y;
-    // par étage
+    const foundP=cl(p/.12); found.scale.setScalar(.6+.4*foundP); found.visible=foundP>.01;
+    const coreP=cl((p-.10)/.20); core.scale.y=Math.max(.001,coreP); coreE.scale.y=core.scale.y;
+
+    // l'ossature monte (sommet ouvert) ; le verre-miroir suit quelques etages plus bas (ferme)
+    const sProg=(p-.24)/.60, gProg=(p-.34)/.54;
     let topY=BO+coreP*H, built=0;
     for(let i=0;i<FLOORS;i++){
-      const sR=reveal(p,.26,.52,i);
-      slabs[i].visible=sR>.02; slabs[i].scale.set(sR,1,sR);
-      const cR=reveal(p,.50,.70,i);
-      cols[i].visible=cR>.02; cols[i].scale.y=Math.max(.001,cR);
-      const fR=reveal(p,.68,.90,i);
-      pans[i].visible=fR>.02; pans[i].material.opacity=.5*fR;
+      const sR=cl(sProg*FLOORS-i);
+      slabs[i].visible=sR>.02; slabs[i].scale.set(.4+.6*sR,1,.4+.6*sR);
+      cols[i].visible=sR>.05; cols[i].scale.y=Math.max(.001,sR);
+      const gR=cl(gProg*FLOORS-i);
+      pans[i].visible=gR>.5;                                    // verre opaque -> apparait clade
       if(sR>.5){built=i+1; topY=BO+(i+1)*FH;}
     }
-    // étape 6 : couronnement + flèche + statue
     const crownP=cl((p-.90)/.10); crown.visible=crownP>.02; crown.scale.setScalar(.4+.6*crownP);
     statue.visible=crownP>.05; statue.scale.setScalar(.3+.7*crownP);
-    if(crownP>.3) topY=BO+H+6.5;
+    if(crownP>.3) topY=BO+H+6.6;
 
-    // bande "en chantier" au front de construction (suit l'effilement)
-    const buildingNow=p>.26&&p<.9;
-    const bl=lvl(Math.max(1,Math.min(FLOORS,built))); const bs=(bl.hw*2*1.05)/(HALF*2.1);
+    const buildingNow=p>.24&&p<.92;
+    const bl=lvl(Math.max(1,Math.min(FLOORS,built))); const bs=(bl.hw*2*1.06)/(HALF*2.12);
     band.visible=buildingNow; band.position.y=topY; band.scale.set(bs,1,bs); band.rotation.y=bl.rot;
-
-    // grue : visible pendant le chantier
     crane.visible=p<.93;
 
-    // caméra suit le sommet construit (recule pour cadrer toute la hauteur + la flèche)
-    const angle=.5+p*2.2, radius=22+p*8, camH=3+topY*.42;
+    const angle=.5+p*2.0, radius=23+p*8, camH=4+topY*.4;
     camera.position.set(Math.sin(angle)*radius,camH,Math.cos(angle)*radius);
-    camera.lookAt(0,topY*.5,0);
+    camera.lookAt(0,topY*.52,0);
     renderer.render(scene,camera);
 
     const ph=Math.min(5,Math.floor(raw*6));
@@ -2852,11 +2867,7 @@ document.getElementById('sendBtn').addEventListener('click',()=>{
   },{passive:true});
 })();
 
-/* ====== Parallaxe légère du hero (titre) ====== */
-(function(){
-  const c=document.querySelector('.hero-center'); if(!c||reduceMotion)return;
-  window.addEventListener('scroll',()=>{const y=window.scrollY;if(y<window.innerHeight){c.style.transform='translateY('+(y*0.18)+'px)';c.style.opacity=String(Math.max(0,1-y/(window.innerHeight*.75)));}},{passive:true});
-})();
+/* (parallaxe du hero retiree : aucune animation au scroll sur l'accueil) */
 
 /* ====== Tilt des cartes projet (3D au survol) ====== */
 (function(){
