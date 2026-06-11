@@ -2559,23 +2559,23 @@ document.addEventListener('keydown',e=>{
 
   /* --- éclairage de base discret + PROJECTEUR qui suit le pointeur --- */
   let spot=null, cone=null, halo=null;
-  const hemi=new THREE.HemisphereLight(0xf4f7ff,0xb9b4a8,LITE?0:.62); scene.add(hemi);
-  const base=new THREE.DirectionalLight(0xffffff,LITE?0:.34); base.position.set(-14,26,-10); scene.add(base);
+  const hemi=new THREE.HemisphereLight(0xf4f7ff,0xb9b4a8,LITE?0:.46); scene.add(hemi);
+  const base=new THREE.DirectionalLight(0xffffff,LITE?0:.22); base.position.set(-14,26,-10); scene.add(base);
   if(!LITE){
-    spot=new THREE.SpotLight(0xfff0d2,1.85,90,.37,.65,1);
+    spot=new THREE.SpotLight(0xfff0d2,2.7,95,.38,.62,1);
     spot.position.set(6,24,8); spot.castShadow=true;
     spot.shadow.mapSize.set(1024,1024); spot.shadow.bias=-0.0004; spot.shadow.normalBias=.02;
     scene.add(spot); scene.add(spot.target);
     // cône de lumière visible (discret le jour, marqué la nuit)
     const cg=new THREE.ConeGeometry(1,1,28,1,true); cg.translate(0,-.5,0);
-    cone=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0xfff3d6,transparent:true,opacity:.055,depthWrite:false,side:THREE.DoubleSide}));
+    cone=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0xfff3d6,transparent:true,opacity:.085,depthWrite:false,side:THREE.DoubleSide}));
     scene.add(cone);
     // halo au sol (texture radiale)
     const hc=document.createElement('canvas'); hc.width=hc.height=128;
     const hx=hc.getContext('2d'); const grd=hx.createRadialGradient(64,64,4,64,64,62);
     grd.addColorStop(0,'rgba(255,238,190,.9)'); grd.addColorStop(.45,'rgba(255,238,190,.32)'); grd.addColorStop(1,'rgba(255,238,190,0)');
     hx.fillStyle=grd; hx.fillRect(0,0,128,128);
-    halo=new THREE.Mesh(new THREE.CircleGeometry(1,40),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(hc),transparent:true,opacity:.34,depthWrite:false}));
+    halo=new THREE.Mesh(new THREE.CircleGeometry(1,40),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(hc),transparent:true,opacity:.46,depthWrite:false}));
     halo.rotation.x=-Math.PI/2; halo.scale.setScalar(4.6); scene.add(halo);
   }
 
@@ -2652,10 +2652,10 @@ document.addEventListener('keydown',e=>{
       m.needsUpdate=true;
     });
     redMat.emissive&&redMat.emissive.setHex(v?0x300508:0x000000);
-    hemi.intensity=v?.16:.62; base.intensity=v?.08:.34;
-    if(spot){spot.intensity=v?3.0:1.85; spot.color.setHex(v?0xffe7b0:0xfff0d2);}
-    if(cone)cone.material.opacity=v?.18:.055;
-    if(halo)halo.material.opacity=v?.5:.34;
+    hemi.intensity=v?.16:.46; base.intensity=v?.08:.22;
+    if(spot){spot.intensity=v?3.4:2.7; spot.color.setHex(v?0xffe7b0:0xfff0d2);}
+    if(cone)cone.material.opacity=v?.2:.085;
+    if(halo)halo.material.opacity=v?.55:.46;
   });
 
   /* --- PROJECTEUR : suit la souris / le doigt ; balayage auto en veille --- */
